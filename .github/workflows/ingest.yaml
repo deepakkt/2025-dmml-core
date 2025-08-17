@@ -1,0 +1,144 @@
+# File: .github/workflows/mockaroo-to-data-repo.yml
+# Purpose: Every 4 hours (and on-demand), fetch JSON from two Mockaroo schemas
+#          and push them into the sibling repo "<owner>/2025-dmml-data" under:
+#          raw-data/YYYY-MM-DD-HH:MM:SS/{engagement|satisfaction}/data.json
+#
+# Prereqs you must set in the repo where this workflow lives:
+#   - Repository Variables:
+#       SCHEMA_ENGAGEMENT = <e.g., 85d441d0>
+#       SCHEMA_SATISFACTION = <e.g., da85de20>
+#   - Repository Secrets:
+#       MOCKAROO_KEY      = <your Mockaroo API key>
+#       DATA_REPO_TOKEN   = <Fine-grained PAT with "Contents: Read/Write" access to the repo 2025-dmml-data>
+#
+# Notes:
+#   - This workflow uses only Python stdlib (urllib) for downloading, per requirement.
+#   - Timestamp folder uses "YYYY-MM-DD-HH:MM:SS" (with colons) as requested.
+
+name: Ingest Mockaroo Data to 2025-dmml-data
+
+on:
+  schedule:
+    - cron: "0 */4 * * *" # Every 4 hours (UTC)
+  workflow_dispatch: {}     # On-demand trigger
+
+permissions:
+  contents: read  # for actions/checkout in THIS repo
+
+env:
+  DATA_REPO: ${{ github.repository_owner }}/2025-dmml-data
+  MAIN_BRANCH: main
+  SCHEMA_ENGAGEMENT: ${{ vars.SCHEMA_ENGAGEMENT }}
+  SCHEMA_SATISFACTION: ${{ vars.SCHEMA_SATISFACTION }}
+  MOCKAROO_KEY: ${{ secrets.MOCKAROO_KEY }}
+  COUNT: "1000"
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout workflow repo (this repo)
+        uses: actions/checkout@v4
+
+      - name: Verify required inputs
+        run: |
+          set -euo pipefail
+          missing=0
+          for v in SCHEMA_ENGAGEMENT SCHEMA_SATISFACTION; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::Repository variable '$v' is not set"
+              missing=1
+            fi
+          done
+          if [ -z "${MOCKAROO_KEY:-}" ]; then
+            echo "::error::Secret 'MOCKAROO_KEY' is not set"
+            missing=1
+          fi
+          if [ -z "${{ secrets.DATA_REPO_TOKEN }}" ]; then
+            echo "::error::Secret 'DATA_REPO_TOKEN' is not set (PAT with access to $DATA_REPO)"
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then exit 1; fi
+
+      - name: Clone target data repo
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${DATA_REPO}.git" data-repo
+          cd data-repo
+          # Ensure we're on the correct default branch
+          git checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"
+
+      - name: Fetch Mockaroo JSONs via Python (stdlib only)
+        run: |
+          set -euo pipefail
+          python3 - << 'PYCODE'
+          import os, json, time
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          from urllib.error import URLError, HTTPError
+
+          SCHEMA_ENGAGEMENT = os.environ["SCHEMA_ENGAGEMENT"]
+          SCHEMA_SATISFACTION = os.environ["SCHEMA_SATISFACTION"]
+          MOCKAROO_KEY = os.environ["MOCKAROO_KEY"]
+          COUNT = os.environ.get("COUNT","1000")
+          base_dir = Path("data-repo")
+
+          def http_get_json(url: str, tries: int = 5, backoff: float = 1.5):
+            last_err = None
+            for i in range(1, tries+1):
+              try:
+                req = Request(url, headers={"User-Agent":"gh-actions-mockaroo-ingest/1.0"})
+                with urlopen(req, timeout=60) as resp:
+                  data = resp.read()
+                # Validate JSON
+                return json.loads(data)
+              except (HTTPError, URLError, json.JSONDecodeError) as e:
+                last_err = e
+                if i < tries:
+                  time.sleep(backoff ** i)
+                else:
+                  raise
+            raise last_err
+
+          def save_dataset(kind: str, schema_id: str, key: str, ts_dir: Path):
+            url = f"https://api.mockaroo.com/api/{schema_id}?count={COUNT}&key={key}"
+            payload = http_get_json(url)
+            out_file = ts_dir / kind / "data.json"
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            with out_file.open("w", encoding="utf-8") as f:
+              json.dump(payload, f, ensure_ascii=False, indent=2)
+            print(f"Wrote {kind} -> {out_file} (records: {len(payload) if isinstance(payload, list) else 'n/a'})")
+
+          # Timestamp folder (UTC) as requested format YYYY-MM-DD-HH:MM:SS
+          ts = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H:%M:%S")
+          ts_dir = base_dir / "raw-data" / ts
+
+          save_dataset("engagement", SCHEMA_ENGAGEMENT, MOCKAROO_KEY, ts_dir)
+          save_dataset("satisfaction", SCHEMA_SATISFACTION, MOCKAROO_KEY, ts_dir)
+
+          # Persist timestamp for commit message in next step
+          with open(base_dir / ".ingest_ts", "w", encoding="utf-8") as f:
+            f.write(ts)
+          PYCODE
+
+      - name: Stage, commit, and push
+        run: |
+          set -euo pipefail
+          TS="$(cat data-repo/.ingest_ts)"
+          echo "INGEST_TS=$TS" >> "$GITHUB_ENV"
+
+          cd data-repo
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Ingest raw data: ${INGEST_TS}"
+          git push origin "HEAD:${MAIN_BRANCH}"
+
+
