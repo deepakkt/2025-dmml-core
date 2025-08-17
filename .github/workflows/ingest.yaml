@@ -2,18 +2,6 @@
 # Purpose: Every 4 hours (and on-demand), fetch JSON from two Mockaroo schemas
 #          and push them into the sibling repo "<owner>/2025-dmml-data" under:
 #          raw-data/YYYY-MM-DD-HH:MM:SS/{engagement|satisfaction}/data.json
-#
-# Prereqs you must set in the repo where this workflow lives:
-#   - Repository Variables:
-#       SCHEMA_ENGAGEMENT = <e.g., 85d441d0>
-#       SCHEMA_SATISFACTION = <e.g., da85de20>
-#   - Repository Secrets:
-#       MOCKAROO_KEY      = <your Mockaroo API key>
-#       DATA_REPO_TOKEN   = <Fine-grained PAT with "Contents: Read/Write" access to the repo 2025-dmml-data>
-#
-# Notes:
-#   - This workflow uses only Python stdlib (urllib) for downloading, per requirement.
-#   - Timestamp folder uses "YYYY-MM-DD-HH:MM:SS" (with colons) as requested.
 
 name: Ingest Mockaroo Data to 2025-dmml-data
 
@@ -65,7 +53,6 @@ jobs:
           set -euo pipefail
           git clone --depth 1 "https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${DATA_REPO}.git" data-repo
           cd data-repo
-          # Ensure we're on the correct default branch
           git checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"
 
       - name: Fetch Mockaroo JSONs via Python (stdlib only)
@@ -91,7 +78,6 @@ jobs:
                 req = Request(url, headers={"User-Agent":"gh-actions-mockaroo-ingest/1.0"})
                 with urlopen(req, timeout=60) as resp:
                   data = resp.read()
-                # Validate JSON
                 return json.loads(data)
               except (HTTPError, URLError, json.JSONDecodeError) as e:
                 last_err = e
@@ -110,14 +96,12 @@ jobs:
               json.dump(payload, f, ensure_ascii=False, indent=2)
             print(f"Wrote {kind} -> {out_file} (records: {len(payload) if isinstance(payload, list) else 'n/a'})")
 
-          # Timestamp folder (UTC) as requested format YYYY-MM-DD-HH:MM:SS
           ts = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H:%M:%S")
           ts_dir = base_dir / "raw-data" / ts
 
           save_dataset("engagement", SCHEMA_ENGAGEMENT, MOCKAROO_KEY, ts_dir)
           save_dataset("satisfaction", SCHEMA_SATISFACTION, MOCKAROO_KEY, ts_dir)
 
-          # Persist timestamp for commit message in next step
           with open(base_dir / ".ingest_ts", "w", encoding="utf-8") as f:
             f.write(ts)
           PYCODE
@@ -126,9 +110,13 @@ jobs:
         run: |
           set -euo pipefail
           TS="$(cat data-repo/.ingest_ts)"
+          # Optional: export for any later steps (not required here)
+          export INGEST_TS="$TS"
+          # Also write to GITHUB_ENV for subsequent steps if you add any
           echo "INGEST_TS=$TS" >> "$GITHUB_ENV"
 
           cd data-repo
+          git config --global --add safe.directory "$PWD"
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
@@ -138,7 +126,6 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Ingest raw data: ${INGEST_TS}"
+          # Use the local variable to avoid unbound var errors
+          git commit -m "Ingest raw data: ${TS}"
           git push origin "HEAD:${MAIN_BRANCH}"
-
-
