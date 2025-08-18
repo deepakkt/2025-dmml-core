@@ -1,0 +1,76 @@
+name: Data Validation Reporter
+
+on:
+  workflow_run:
+    workflows: ["Ingest Mockaroo Data to 2025-dmml-data"]
+    types: [completed]
+  workflow_dispatch: {}     # On-demand trigger
+
+permissions:
+  contents: read  # for actions/checkout in THIS repo
+
+env:
+  DATA_REPO: ${{ github.repository_owner }}/2025-dmml-data
+  MAIN_BRANCH: main
+
+jobs:
+  validate:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout workflow repo (this repo)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install requirements
+        run: |
+          set -euo pipefail
+          if [ -f tools/data_validation_reporter/requirements.txt ]; then
+            python -m pip install -r tools/data_validation_reporter/requirements.txt
+          else
+            python -m pip install pandas
+          fi
+
+      - name: Verify PAT secret exists
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.DATA_REPO_TOKEN }}" ]; then
+            echo "::error::Secret 'DATA_REPO_TOKEN' is not set (PAT with access to $DATA_REPO)"
+            exit 1
+          fi
+
+      - name: Clone target data repo
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${DATA_REPO}.git" data-repo
+          cd data-repo
+          git checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"
+          echo "Cloned ${DATA_REPO} on branch ${MAIN_BRANCH}"
+        # Mirrors ingest repo cloning style. :contentReference[oaicite:2]{index=2} :contentReference[oaicite:3]{index=3}
+
+      - name: Run Data Validation Reporter
+        run: |
+          set -euo pipefail
+          python tools/data_validation_reporter/main.py --data-repo data-repo
+
+      - name: Commit & push reports (if any)
+        run: |
+          set -euo pipefail
+          cd data-repo
+          git config --global --add safe.directory "$PWD"
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new validation reports to commit."
+            exit 0
+          fi
+
+          git commit -m "Add data_cleansing_report.csv for new ingests"
+          git push origin "HEAD:${MAIN_BRANCH}"
