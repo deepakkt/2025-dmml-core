@@ -1,0 +1,45 @@
+          import os, json, time
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          from urllib.error import URLError, HTTPError
+
+          SCHEMA_ENGAGEMENT = os.environ["SCHEMA_ENGAGEMENT"]
+          SCHEMA_SATISFACTION = os.environ["SCHEMA_SATISFACTION"]
+          MOCKAROO_KEY = os.environ["MOCKAROO_KEY"]
+          COUNT = os.environ.get("COUNT","1000")
+          base_dir = Path("data-repo")
+
+          def http_get_json(url: str, tries: int = 5, backoff: float = 1.5):
+            last_err = None
+            for i in range(1, tries+1):
+              try:
+                req = Request(url, headers={"User-Agent":"gh-actions-mockaroo-ingest/1.0"})
+                with urlopen(req, timeout=60) as resp:
+                  data = resp.read()
+                return json.loads(data)
+              except (HTTPError, URLError, json.JSONDecodeError) as e:
+                last_err = e
+                if i < tries:
+                  time.sleep(backoff ** i)
+                else:
+                  raise
+            raise last_err
+
+          def save_dataset(kind: str, schema_id: str, key: str, ts_dir: Path):
+            url = f"https://api.mockaroo.com/api/{schema_id}?count={COUNT}&key={key}"
+            payload = http_get_json(url)
+            out_file = ts_dir / kind / "data.json"
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            with out_file.open("w", encoding="utf-8") as f:
+              json.dump(payload, f, ensure_ascii=False, indent=2)
+            print(f"Wrote {kind} -> {out_file} (records: {len(payload) if isinstance(payload, list) else 'n/a'})")
+
+          ts = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H:%M:%S")
+          ts_dir = base_dir / "raw-data" / ts
+
+          save_dataset("engagement", SCHEMA_ENGAGEMENT, MOCKAROO_KEY, ts_dir)
+          save_dataset("satisfaction", SCHEMA_SATISFACTION, MOCKAROO_KEY, ts_dir)
+
+          with open(base_dir / ".ingest_ts", "w", encoding="utf-8") as f:
+            f.write(ts)

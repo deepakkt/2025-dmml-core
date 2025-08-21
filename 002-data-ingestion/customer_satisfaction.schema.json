@@ -1,0 +1,102 @@
+{
+  "id": 699768,
+  "num_rows": 1000,
+  "file_format": "json",
+  "name": "customer_satisfaction",
+  "array": true,
+  "columns": [
+    {
+      "name": "customer_id",
+      "null_percentage": 1,
+      "type": "MongoDB ObjectID",
+      "formula": null
+    },
+    {
+      "name": "age",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 18,
+      "max": 75,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "region",
+      "null_percentage": 0,
+      "type": "Custom List",
+      "values": [
+        "Urban",
+        "Semi-Urban",
+        "Rural"
+      ],
+      "selectionStyle": "random",
+      "distribution": null,
+      "formula": null
+    },
+    {
+      "name": "contract_type",
+      "null_percentage": 1,
+      "type": "Custom List",
+      "values": [
+        "Monthly",
+        "Quarterly",
+        "Annual",
+        "Annul"
+      ],
+      "selectionStyle": "random",
+      "distribution": null,
+      "formula": null
+    },
+    {
+      "name": "avg_monthly_bill",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 10,
+      "max": 200,
+      "decimals": 1,
+      "formula": null
+    },
+    {
+      "name": "payment_delay_days",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 0,
+      "max": 30,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "customer_support_calls_last_6m",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 0,
+      "max": 15,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "net_promoter_score",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": -100,
+      "max": 100,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "discounts_received_last_6m",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 0,
+      "max": 5,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "churned",
+      "null_percentage": 0,
+      "type": "Boolean",
+      "formula": null
+    }
+  ]
+}

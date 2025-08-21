@@ -1,0 +1,94 @@
+{
+  "id": 699767,
+  "num_rows": 1000,
+  "file_format": "json",
+  "name": "subscriber_engagement",
+  "array": true,
+  "columns": [
+    {
+      "name": "customer_id",
+      "null_percentage": 0,
+      "type": "MongoDB ObjectID",
+      "formula": null
+    },
+    {
+      "name": "signup_date",
+      "null_percentage": 0,
+      "type": "Datetime",
+      "min": "06/11/2020",
+      "max": "08/17/2025",
+      "format": "%Y-%m-%d",
+      "formula": null
+    },
+    {
+      "name": "last_login_date",
+      "null_percentage": 2,
+      "type": "Datetime",
+      "min": "06/11/2020",
+      "max": "08/17/2025",
+      "format": "%-m/%-d/%Y",
+      "formula": null
+    },
+    {
+      "name": "subscription_plan",
+      "null_percentage": 1,
+      "type": "Custom List",
+      "values": [
+        "Basic",
+        "Pro",
+        "Enterprise"
+      ],
+      "selectionStyle": "random",
+      "distribution": null,
+      "formula": null
+    },
+    {
+      "name": "monthly_spend",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 5,
+      "max": 500,
+      "decimals": 2,
+      "formula": null
+    },
+    {
+      "name": "support_tickets_last_90d",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 0,
+      "max": 25,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "avg_session_length_minutes",
+      "null_percentage": 1,
+      "type": "Number",
+      "min": 1,
+      "max": 120,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "email_opens_last_30d",
+      "null_percentage": 0,
+      "type": "Number",
+      "min": 0,
+      "max": 25,
+      "decimals": 0,
+      "formula": null
+    },
+    {
+      "name": "auto_renew_enabled",
+      "null_percentage": 0,
+      "type": "Boolean",
+      "formula": null
+    },
+    {
+      "name": "churned",
+      "null_percentage": 0,
+      "type": "Boolean",
+      "formula": null
+    }
+  ]
+}
