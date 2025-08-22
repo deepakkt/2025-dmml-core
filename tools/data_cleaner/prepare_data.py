@@ -2,161 +2,54 @@
 import argparse
 import json
 import os
-import re
 from glob import glob
-from datetime import datetime
+from typing import List
 
 import pandas as pd
-from dateutil import parser as dtparser
 
-# ---------- Helpers
+
+# ------------------------
+# Helpers
+# ------------------------
+
 def _safe_to_datetime(s):
-    """Robustly parse timestamps/dates into pandas datetime; return NaT on failure."""
+    """Parse to pandas datetime; NaT on failure."""
     return pd.to_datetime(s, errors="coerce")
 
-def _strip_tz(dt_series: pd.Series) -> pd.Series:
-    """Ensure naive datetimes (no timezone) for consistent merging."""
-    try:
-        return dt_series.dt.tz_localize(None)
-    except Exception:
-        return dt_series
-
-def _month_key(dt_series: pd.Series) -> pd.Series:
-    """YYYY-MM period string used as a coarse join key."""
-    return dt_series.dt.to_period("M").astype(str)
-
-def _merge_progressive(eng_latest: pd.DataFrame, sat_latest: pd.DataFrame) -> pd.DataFrame:
-    """
-    Progressive merge strategy:
-      1) Exact (customer_id, asof_date)
-      2) Month-level (customer_id, asof_month)
-      3) Nearest within ±7D using merge_asof (by=customer_id)
-      4) Backward (latest sat at or before eng date)
-    Always keeps the engagement as the 'left' side (we preserve eng asof_date).
-    """
-    # --- Prepare keys
-    e = eng_latest.copy()
-    s = sat_latest.copy()
-
-    e["asof_date"] = _strip_tz(e["asof_date"])
-    s["asof_date"] = _strip_tz(s["asof_date"])
-
-    e["asof_month"] = _month_key(e["asof_date"])
-    s["asof_month"] = _month_key(s["asof_date"])
-
-    key_cols = ["customer_id", "asof_date"]
-    sat_cols = [c for c in s.columns if c not in key_cols and c not in {"asof_month"}]
-
-    # --- 1) exact date
-    exact = pd.merge(
-        e, s, on=key_cols, how="left", suffixes=("_eng", "_sat")
-    )
-
-    matched_mask = exact["age"].notna() | exact["region_le"].notna() | exact["contract_type_le"].notna()
-    remaining = exact[~matched_mask].drop(columns=[c for c in exact.columns if c.endswith("_sat")], errors="ignore")
-    matched_exact = exact[matched_mask]
-
-    # --- 2) same month
-    month_join = pd.merge(
-        remaining,
-        s.drop(columns=["asof_date"]).rename(columns={"asof_month": "asof_month_sat"}),
-        left_on=["customer_id", "asof_month"], right_on=["customer_id", "asof_month_sat"],
-        how="left"
-    )
-    # move sat columns into *_sat namespace for consistency
-    for c in sat_cols:
-        if c in month_join.columns:
-            month_join.rename(columns={c: f"{c}_sat"}, inplace=True)
-
-    matched_mask2 = month_join[[f"{c}_sat" for c in ["age","region_le","contract_type_le"] if f"{c}_sat" in month_join.columns]].any(axis=1)
-    remaining2 = month_join[~matched_mask2].copy()
-    matched_month = month_join[matched_mask2].copy()
-
-    # --- 3) nearest within ±7D per customer using merge_asof
-    # prepare frames sorted by date
-    e_near = remaining2.sort_values("asof_date")
-    s_near = s.sort_values("asof_date")
-
-    near = pd.merge_asof(
-        e_near,
-        s_near.sort_values("asof_date"),
-        left_on="asof_date",
-        right_on="asof_date",
-        by="customer_id",
-        direction="nearest",
-        tolerance=pd.Timedelta("7D")
-    )
-
-    # rename sat cols to *_sat in this block
-    for c in sat_cols:
-        if c in near.columns:
-            near.rename(columns={c: f"{c}_sat"}, inplace=True)
-
-    matched_mask3 = near[[f"{c}_sat" for c in ["age","region_le","contract_type_le"] if f"{c}_sat" in near.columns]].any(axis=1)
-    remaining3 = near[~matched_mask3].copy()
-    matched_near = near[matched_mask3].copy()
-
-    # --- 4) latest at/before engagement date (backward)
-    backward = pd.merge_asof(
-        remaining3.sort_values("asof_date"),
-        s_near,
-        left_on="asof_date",
-        right_on="asof_date",
-        by="customer_id",
-        direction="backward"
-    )
-    for c in sat_cols:
-        if c in backward.columns:
-            backward.rename(columns={c: f"{c}_sat"}, inplace=True)
-
-    # --- Concatenate all matched; rows still unmatched after step 4 will be dropped
-    matched_all = pd.concat([matched_exact, matched_month, matched_near, backward], ignore_index=True)
-
-    # Keep rows where we have at least some sat signal (region/contract is a good proxy)
-    have_sat = matched_all[[f"{c}_sat" for c in ["region_le","contract_type_le"] if f"{c}_sat" in matched_all.columns]].any(axis=1)
-    merged = matched_all[have_sat].copy()
-
-    return merged
-
-
-def _extract_customer_id(df):
+def _extract_customer_id(df: pd.DataFrame) -> pd.Series:
     """
     Unify customer_id. Supports:
-      - nested {"$oid": "..."} as 'customer_id.$oid' (json_normalize)
-      - plain string 'customer_id'
+      - 'customer_id.$oid' (flattened via json_normalize)
+      - raw 'customer_id' possibly as dict {"$oid": "..."} or as a string
     """
     if "customer_id.$oid" in df.columns:
-        cid = df["customer_id.$oid"].astype(str)
-    elif "customer_id" in df.columns:
-        # Could be dicts or strings
+        return df["customer_id.$oid"].astype(str)
+    if "customer_id" in df.columns:
         def _cid(x):
             if isinstance(x, dict):
-                return x.get("$oid") or x.get("oid") or x.get("id") or ""
+                return str(x.get("$oid") or x.get("oid") or x.get("id") or "")
             return "" if pd.isna(x) else str(x)
-        cid = df["customer_id"].apply(_cid)
-    else:
-        cid = pd.Series([""] * len(df))
-    return cid
+        return df["customer_id"].apply(_cid)
+    return pd.Series([""] * len(df))
 
-def _coalesce_cols(df, candidates, default=None):
-    """Return the first existing column among candidates; else a Series[default]."""
-    for c in candidates:
-        if c in df.columns:
-            return df[c]
+def _coalesce(df: pd.DataFrame, names: List[str], default=None) -> pd.Series:
+    """Return first present column; else constant default Series."""
+    for n in names:
+        if n in df.columns:
+            return df[n]
     return pd.Series([default] * len(df))
 
-def _label_map(series, ordered_classes):
-    """Deterministic label encoding based on provided ordered class list."""
-    mapping = {cls: i for i, cls in enumerate(ordered_classes)}
-    # unseen -> append 'Unknown' if present in order; else -1
-    if "Unknown" in mapping:
-        return series.map(lambda v: mapping.get(v, mapping["Unknown"])).astype(int)
-    return series.map(lambda v: mapping.get(v, -1)).astype(int)
+def _label_map(series: pd.Series, ordered_classes: List[str]) -> pd.Series:
+    """Deterministic label encode; unseen -> 'Unknown' if available, else -1."""
+    mapping = {c: i for i, c in enumerate(ordered_classes)}
+    unk = mapping.get("Unknown", -1)
+    return series.map(lambda v: mapping.get(v, unk)).astype(int)
 
-def _minmax_inplace(df, cols):
-    """Apply min-max normalization in place (0..1). If constant col -> set to 0.0."""
+def _minmax_inplace(df: pd.DataFrame, cols: List[str]) -> None:
+    """Min-max normalize to [0,1]; constant/empty -> 0.0."""
     for c in cols:
         if c not in df.columns:
+            df[c] = 0.0
             continue
         s = pd.to_numeric(df[c], errors="coerce").fillna(0.0)
         mn, mx = s.min(), s.max()
@@ -165,18 +58,8 @@ def _minmax_inplace(df, cols):
         else:
             df[c] = (s - mn) / (mx - mn)
 
-def _clean_contract_type(ct_raw):
-    if pd.isna(ct_raw):
-        return None
-    s = str(ct_raw).strip()
-    s = re.sub(r"annul|anual", "Annual", s, flags=re.IGNORECASE)  # common typos
-    s = s.replace("Annul", "Annual")
-    s = s.title()
-    if s not in {"Monthly", "Quarterly", "Annual"}:
-        return None
-    return s
-
-def _to_ymd_str(dt):
+def _fmt_ymd(dt):
+    """Format datetime to %Y-%m-%d; empty string if NaT/None."""
     if pd.isna(dt):
         return ""
     try:
@@ -184,17 +67,18 @@ def _to_ymd_str(dt):
     except Exception:
         return ""
 
-def _parse_ingest_ts(ts_name):
-    """Best-effort to parse folder name to comparable sortable key."""
-    try:
-        return pd.to_datetime(ts_name, errors="coerce")
-    except Exception:
-        return pd.NaT
 
-# ---------- Loaders
+# ------------------------
+# IO
+# ------------------------
 
-def _load_all_json_rows(paths):
-    """Read list-of-dict JSON from files into a single DataFrame via json_normalize."""
+def _find_engagement_paths(data_repo: str) -> List[str]:
+    """Find all raw-data/*/engagement/data.json files."""
+    pat = os.path.join(data_repo, "raw-data", "*", "engagement", "data.json")
+    return sorted(glob(pat))
+
+def _load_all_json(paths: List[str]) -> pd.DataFrame:
+    """Load list-of-dict JSONs and add ingest_ts from folder name."""
     dfs = []
     for p in paths:
         try:
@@ -203,44 +87,47 @@ def _load_all_json_rows(paths):
             if isinstance(data, list):
                 df = pd.json_normalize(data)
             else:
-                # If single object, wrap
                 df = pd.json_normalize([data])
-            # derive ingest_ts from raw-data/<ts>/<kind>/data.json
             parts = os.path.normpath(p).split(os.sep)
-            # .../raw-data/<timestamp>/<kind>/data.json
-            try:
-                ts = parts[-3]
-            except Exception:
-                ts = ""
+            ts = parts[-3] if len(parts) >= 3 else ""
             df["ingest_ts"] = ts
             dfs.append(df)
         except Exception as e:
             print(f"[WARN] Skipping {p}: {e}")
-    if not dfs:
-        return pd.DataFrame()
-    return pd.concat(dfs, ignore_index=True)
+    return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
-def _find_paths(data_repo, kind_dir):
+
+# ------------------------
+# Cleaning (ENGAGEMENT ONLY)
+# ------------------------
+
+def clean_engagement_only(df_raw: pd.DataFrame) -> pd.DataFrame:
     """
-    kind_dir in {"engagement", "satisfaction", "satisfication"}.
-    Returns all 'raw-data/*/<kind_dir>/data.json'.
+    Apply the engagement cleaning rules:
+
+    4a.i  customer_id.$oid => use as is, skip row if blank
+    4a.ii asof_date => skip row if blank
+    4a.iii signup_date => skip row if blank
+    4a.iv subscription_plan => label encode
+    4a.v  monthly_spend => normalize (use zero if missing)
+    4a.vi support_tickets_last_90d => normalize (use zero if missing)
+    4a.vii avg_session_length_minutes => normalize (use zero if missing)
+    4a.viii email_opens_last_30d => normalize (use zero if missing)
+    4a.ix auto_renew_enabled => use False if missing, then one-hot encode
+    4a.x  last_login_date => translate to "%Y-%m-%d". blanks allowed
+    4a.xi churned => label encode
     """
-    pat = os.path.join(data_repo, "raw-data", "*", kind_dir, "data.json")
-    return sorted(glob(pat))
 
-# ---------- Cleaning per dataset
+    if df_raw.empty:
+        return df_raw.copy()
 
-def clean_engagement(df):
-    if df.empty:
-        return df
+    df = df_raw.copy()
 
-    df = df.copy()
-
-    # Keys
+    # --- Key fields
     df["customer_id"] = _extract_customer_id(df)
-    df["asof_date"]   = _coalesce_cols(df, ["asof_date"])
-    df["signup_date"] = _coalesce_cols(df, ["signup_date"])
-    df["last_login_date"] = _coalesce_cols(df, ["last_login_date"])
+    df["asof_date"]   = _coalesce(df, ["asof_date"])
+    df["signup_date"] = _coalesce(df, ["signup_date"])
+    df["last_login_date"] = _coalesce(df, ["last_login_date"])
 
     # Parse dates
     df["asof_date"] = _safe_to_datetime(df["asof_date"])
@@ -248,30 +135,32 @@ def clean_engagement(df):
     df["last_login_date"] = _safe_to_datetime(df["last_login_date"])
 
     # Mandatory row filters
+    before = len(df)
     df = df[(df["customer_id"].str.len() > 0)]
     df = df[~df["asof_date"].isna()]
     df = df[~df["signup_date"].isna()]
+    after = len(df)
+    print(f"Engagement: filtered mandatory keys {before} -> {after}")
 
-    # Categorical encodes
-    sub = _coalesce_cols(df, ["subscription_plan"]).astype(str).str.strip()
-    sub = sub.where(sub.notna() & (sub != "") , "Unknown")
+    # Categorical: subscription_plan -> label encode
+    sub = _coalesce(df, ["subscription_plan"]).astype(str).str.strip()
+    sub = sub.where(sub.notna() & (sub != ""), "Unknown")
     df["subscription_plan_le"] = _label_map(sub, ["Basic", "Pro", "Enterprise", "Unknown"])
 
-    churn_raw = _coalesce_cols(df, ["churned"])
-    # Normalize truthy/falsy
-    df["churned_engagement"] = churn_raw.map(lambda v: 1 if str(v).lower() in {"1","true","t","yes","y"} else 0).astype(int)
+    # churned -> label encode (boolean-like to 0/1)
+    churn_raw = _coalesce(df, ["churned"])
+    df["churned"] = churn_raw.map(lambda v: 1 if str(v).lower() in {"1","true","t","yes","y"} else 0).astype(int)
 
-    # Booleans → one-hot
-    auto_raw = _coalesce_cols(df, ["auto_renew_enabled"]).map(lambda v: str(v).lower() in {"1","true","t","yes","y"})
+    # auto_renew_enabled -> missing -> False -> one-hot
+    auto_raw = _coalesce(df, ["auto_renew_enabled"]).map(lambda v: str(v).lower() in {"1","true","t","yes","y"})
     auto_raw = auto_raw.fillna(False)
     dummies = pd.get_dummies(auto_raw, prefix="auto_renew_enabled")
-    # Ensure both columns exist for stable schema
     for col in ["auto_renew_enabled_False", "auto_renew_enabled_True"]:
         if col not in dummies.columns:
             dummies[col] = 0
     df = pd.concat([df, dummies], axis=1)
 
-    # Numeric fill then normalize later
+    # Numerics: fill 0 then normalize in place
     num_cols = [
         "monthly_spend",
         "support_tickets_last_90d",
@@ -284,95 +173,54 @@ def clean_engagement(df):
         else:
             df[c] = 0.0
 
-    # Date translations
-    df["last_login_date_std"] = df["last_login_date"].map(_to_ymd_str)
-    df["days_since_last_login"] = (df["asof_date"] - df["last_login_date"]).dt.days.fillna(-1).astype(int)
+    _minmax_inplace(df, num_cols)
 
-    # Keep only columns needed for merge & model
-    keep = [
-        "customer_id", "asof_date", "signup_date",
+    # last_login_date -> "%Y-%m-%d" (blanks allowed)
+    df["last_login_date"] = df["last_login_date"].map(_fmt_ymd)
+
+    # also standardize asof_date/signup_date to "%Y-%m-%d" for consistency
+    df["asof_date"] = df["asof_date"].map(_fmt_ymd)
+    df["signup_date"] = df["signup_date"].map(_fmt_ymd)
+
+    # Keep only required/output columns
+    out_cols = [
+        "customer_id",
+        "asof_date",
+        "signup_date",
+        "last_login_date",
         "subscription_plan_le",
-        "monthly_spend", "support_tickets_last_90d", "avg_session_length_minutes", "email_opens_last_30d",
-        "auto_renew_enabled_False", "auto_renew_enabled_True",
-        "last_login_date_std", "days_since_last_login",
-        "churned_engagement", "ingest_ts",
+        "monthly_spend",
+        "support_tickets_last_90d",
+        "avg_session_length_minutes",
+        "email_opens_last_30d",
+        "auto_renew_enabled_False",
+        "auto_renew_enabled_True",
+        "churned",
+        "ingest_ts",  # keep for traceability; not used in modeling
     ]
-    return df[keep]
 
-def clean_satisfaction(df):
+    for c in out_cols:
+        if c not in df.columns:
+            # default types: strings for ids/dates, 0 for numerics/bools
+            df[c] = "" if c in {"customer_id","asof_date","signup_date","last_login_date","ingest_ts"} else 0
+
+    return df[out_cols]
+
+
+def latest_per_key(df: pd.DataFrame, key_cols: List[str]) -> pd.DataFrame:
+    """Within each (customer_id, asof_date), keep the row with the latest ingest_ts (lexical and datetime-aware)."""
     if df.empty:
         return df
+    ts_parsed = pd.to_datetime(df["ingest_ts"], errors="coerce")
+    df = df.assign(_ts=ts_parsed, _lex=df["ingest_ts"].astype(str))
+    # sort so that tail(1) keeps the latest (by parsed ts then lexical)
+    df = df.sort_values(by=["_ts", "_lex"]).groupby(key_cols, as_index=False).tail(1)
+    return df.drop(columns=["_ts", "_lex"])
 
-    df = df.copy()
 
-    # Keys
-    df["customer_id"] = _extract_customer_id(df)
-    df["asof_date"]   = _coalesce_cols(df, ["asof_date"])
-    df["asof_date"] = _safe_to_datetime(df["asof_date"])
-
-    # Drop rows missing required keys
-    df = df[(df["customer_id"].str.len() > 0)]
-    df = df[~df["asof_date"].isna()]
-
-    # Region: drop blanks then label encode
-    region = _coalesce_cols(df, ["region"]).astype(str).str.strip()
-    df = df[region != ""]
-    region = region.loc[df.index]
-    df["region_le"] = _label_map(region, ["Rural", "Semi-Urban", "Urban"])
-
-    # Contract type: fix typos, drop blanks, label encode
-    ct = _coalesce_cols(df, ["contract_type"]).map(_clean_contract_type)
-    df = df[ct.notna()]
-    ct = ct.loc[df.index]
-    df["contract_type_le"] = _label_map(ct, ["Annual", "Monthly", "Quarterly"])
-
-    # Numerics (fill 0 → normalize later)
-    num_cols = [
-        "age", "avg_monthly_bill", "payment_delay_days",
-        "customer_support_calls_last_6m", "net_promoter_score", "discounts_received_last_6m",
-    ]
-    for c in num_cols:
-        if c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0.0)
-        else:
-            df[c] = 0.0
-
-    # Churn
-    churn_raw = _coalesce_cols(df, ["churned"])
-    df["churned_satisfaction"] = churn_raw.map(lambda v: 1 if str(v).lower() in {"1","true","t","yes","y"} else 0).astype(int)
-
-    keep = [
-        "customer_id", "asof_date",
-        "age", "avg_monthly_bill", "payment_delay_days",
-        "customer_support_calls_last_6m", "net_promoter_score", "discounts_received_last_6m",
-        "region_le", "contract_type_le",
-        "churned_satisfaction", "ingest_ts",
-    ]
-    return df[keep]
-
-def latest_per_key(df, key_cols):
-    """Within each (customer_id, asof_date) group, keep row with max ingest_ts."""
-    if df.empty:
-        return df
-    # make sortable ts
-    ts = df["ingest_ts"].apply(_parse_ingest_ts)
-    # fallback: lexical order if parse fails
-    ts_rank = ts.fillna(pd.NaT)
-    df = df.assign(_sort_ts=ts_rank, _lex=df["ingest_ts"].astype(str))
-    df = df.sort_values(by=["_sort_ts", "_lex"]).groupby(key_cols, as_index=False).tail(1)
-    return df.drop(columns=["_sort_ts", "_lex"])
-
-def consolidate_churn(row):
-    e = row.get("churned_engagement", None)
-    s = row.get("churned_satisfaction", None)
-    if pd.isna(e) and pd.isna(s):
-        return 0
-    if pd.isna(e):
-        return int(s)
-    if pd.isna(s):
-        return int(e)
-    # If both present and disagree, prefer engagement
-    return int(e)
+# ------------------------
+# Main
+# ------------------------
 
 def main():
     ap = argparse.ArgumentParser()
@@ -380,91 +228,29 @@ def main():
     args = ap.parse_args()
 
     data_repo = args.data_repo
-    # Find raw JSONs
-    eng_paths = _find_paths(data_repo, "engagement")
-    sat_paths = _find_paths(data_repo, "satisfaction") + _find_paths(data_repo, "satisfication")
 
-    print(f"Found {len(eng_paths)} engagement files, {len(sat_paths)} satisfaction files.")
+    eng_paths = _find_engagement_paths(data_repo)
+    print(f"Found {len(eng_paths)} engagement files.")
+    eng_raw = _load_all_json(eng_paths)
+    print(f"Loaded engagement rows: {len(eng_raw):,}")
 
-    eng_raw = _load_all_json_rows(eng_paths)
-    sat_raw = _load_all_json_rows(sat_paths)
+    cleaned = clean_engagement_only(eng_raw)
+    print(f"Cleaned engagement rows: {len(cleaned):,}")
 
-    eng = clean_engagement(eng_raw)
-    sat = clean_satisfaction(sat_raw)
+    # Deduplicate to latest per (customer_id, asof_date)
+    cleaned_latest = latest_per_key(cleaned, ["customer_id", "asof_date"])
+    print(f"After latest-per-key: {len(cleaned_latest):,}")
 
-    print(f"Engagement: raw={len(eng_raw):,} -> cleaned={len(eng):,}")
-    print(f"Satisfaction: raw={len(sat_raw):,} -> cleaned={len(sat):,}")
-    print(f"Distinct keys: eng={eng[['customer_id','asof_date']].drop_duplicates().shape[0]:,}, "
-      f"sat={sat[['customer_id','asof_date']].drop_duplicates().shape[0]:,}")
+    # Sort for determinism
+    cleaned_latest = cleaned_latest.sort_values(by=["asof_date", "customer_id"]).reset_index(drop=True)
 
-
-    # Deduplicate within each dataset by latest ingest
-    key_cols = ["customer_id", "asof_date"]
-    eng_latest = latest_per_key(eng, key_cols)
-    sat_latest = latest_per_key(sat, key_cols)
-
-    # Normalize numeric columns per instructions
-    eng_norm_cols = ["monthly_spend", "support_tickets_last_90d", "avg_session_length_minutes", "email_opens_last_30d", "days_since_last_login"]
-    _minmax_inplace(eng_latest, eng_norm_cols)
-
-    sat_norm_cols = ["age", "avg_monthly_bill", "payment_delay_days", "customer_support_calls_last_6m", "net_promoter_score", "discounts_received_last_6m"]
-    _minmax_inplace(sat_latest, sat_norm_cols)
-
-    # Merge (inner) on keys across latest snapshots
-    print("Deduping to latest per (customer_id, asof_date)...")
-    key_cols = ["customer_id", "asof_date"]
-    eng_latest = latest_per_key(eng, key_cols)
-    sat_latest = latest_per_key(sat, key_cols)
-    print(f"Latest snapshots: eng={len(eng_latest):,}, sat={len(sat_latest):,}")
-
-    print("Merging progressively (exact date -> month -> nearest ±7d -> backward)...")
-    merged = _merge_progressive(eng_latest, sat_latest)
-    print(f"Merged rows after progressive join: {len(merged):,}")
-
-    # Produce consolidated target
-    merged["churned"] = merged.apply(consolidate_churn, axis=1).astype(int)
-
-    # Output schema
-    out_cols = [
-        "customer_id", "asof_date", "signup_date",
-        "last_login_date_std",
-        "days_since_last_login",
-        "subscription_plan_le",
-        "auto_renew_enabled_False", "auto_renew_enabled_True",
-        "monthly_spend",
-        "support_tickets_last_90d",
-        "avg_session_length_minutes",
-        "email_opens_last_30d",
-        "age",
-        "region_le",
-        "contract_type_le",
-        "avg_monthly_bill",
-        "payment_delay_days",
-        "customer_support_calls_last_6m",
-        "net_promoter_score",
-        "discounts_received_last_6m",
-        "churned",                 # consolidated target
-        "churned_engagement",      # traceability
-        "churned_satisfaction",    # traceability
-    ]
-
-    # Coerce dates to desired text format
-    merged["asof_date"] = merged["asof_date"].map(_to_ymd_str)
-    merged["signup_date"] = merged["signup_date"].map(_to_ymd_str)
-
-    # Ensure all columns exist
-    for c in out_cols:
-        if c not in merged.columns:
-            merged[c] = "" if c in {"customer_id","asof_date","signup_date","last_login_date_std"} else 0
-
-    out = merged[out_cols].copy()
-
-    # Write
+    # Write output
     out_dir = os.path.join(data_repo, "prepared-data")
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "prepared.csv")
-    out.to_csv(out_path, index=False)
-    print(f"Wrote {len(out):,} rows to {out_path}")
+
+    cleaned_latest.to_csv(out_path, index=False)
+    print(f"Wrote {len(cleaned_latest):,} rows to {out_path}")
 
 if __name__ == "__main__":
     main()
