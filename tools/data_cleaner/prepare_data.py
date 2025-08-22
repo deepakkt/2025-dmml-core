@@ -10,10 +10,114 @@ import pandas as pd
 from dateutil import parser as dtparser
 
 # ---------- Helpers
-
 def _safe_to_datetime(s):
     """Robustly parse timestamps/dates into pandas datetime; return NaT on failure."""
-    return pd.to_datetime(s, errors="coerce", infer_datetime_format=True)
+    return pd.to_datetime(s, errors="coerce")
+
+def _strip_tz(dt_series: pd.Series) -> pd.Series:
+    """Ensure naive datetimes (no timezone) for consistent merging."""
+    try:
+        return dt_series.dt.tz_localize(None)
+    except Exception:
+        return dt_series
+
+def _month_key(dt_series: pd.Series) -> pd.Series:
+    """YYYY-MM period string used as a coarse join key."""
+    return dt_series.dt.to_period("M").astype(str)
+
+def _merge_progressive(eng_latest: pd.DataFrame, sat_latest: pd.DataFrame) -> pd.DataFrame:
+    """
+    Progressive merge strategy:
+      1) Exact (customer_id, asof_date)
+      2) Month-level (customer_id, asof_month)
+      3) Nearest within ±7D using merge_asof (by=customer_id)
+      4) Backward (latest sat at or before eng date)
+    Always keeps the engagement as the 'left' side (we preserve eng asof_date).
+    """
+    # --- Prepare keys
+    e = eng_latest.copy()
+    s = sat_latest.copy()
+
+    e["asof_date"] = _strip_tz(e["asof_date"])
+    s["asof_date"] = _strip_tz(s["asof_date"])
+
+    e["asof_month"] = _month_key(e["asof_date"])
+    s["asof_month"] = _month_key(s["asof_date"])
+
+    key_cols = ["customer_id", "asof_date"]
+    sat_cols = [c for c in s.columns if c not in key_cols and c not in {"asof_month"}]
+
+    # --- 1) exact date
+    exact = pd.merge(
+        e, s, on=key_cols, how="left", suffixes=("_eng", "_sat")
+    )
+
+    matched_mask = exact["age"].notna() | exact["region_le"].notna() | exact["contract_type_le"].notna()
+    remaining = exact[~matched_mask].drop(columns=[c for c in exact.columns if c.endswith("_sat")], errors="ignore")
+    matched_exact = exact[matched_mask]
+
+    # --- 2) same month
+    month_join = pd.merge(
+        remaining,
+        s.drop(columns=["asof_date"]).rename(columns={"asof_month": "asof_month_sat"}),
+        left_on=["customer_id", "asof_month"], right_on=["customer_id", "asof_month_sat"],
+        how="left"
+    )
+    # move sat columns into *_sat namespace for consistency
+    for c in sat_cols:
+        if c in month_join.columns:
+            month_join.rename(columns={c: f"{c}_sat"}, inplace=True)
+
+    matched_mask2 = month_join[[f"{c}_sat" for c in ["age","region_le","contract_type_le"] if f"{c}_sat" in month_join.columns]].any(axis=1)
+    remaining2 = month_join[~matched_mask2].copy()
+    matched_month = month_join[matched_mask2].copy()
+
+    # --- 3) nearest within ±7D per customer using merge_asof
+    # prepare frames sorted by date
+    e_near = remaining2.sort_values("asof_date")
+    s_near = s.sort_values("asof_date")
+
+    near = pd.merge_asof(
+        e_near,
+        s_near.sort_values("asof_date"),
+        left_on="asof_date",
+        right_on="asof_date",
+        by="customer_id",
+        direction="nearest",
+        tolerance=pd.Timedelta("7D")
+    )
+
+    # rename sat cols to *_sat in this block
+    for c in sat_cols:
+        if c in near.columns:
+            near.rename(columns={c: f"{c}_sat"}, inplace=True)
+
+    matched_mask3 = near[[f"{c}_sat" for c in ["age","region_le","contract_type_le"] if f"{c}_sat" in near.columns]].any(axis=1)
+    remaining3 = near[~matched_mask3].copy()
+    matched_near = near[matched_mask3].copy()
+
+    # --- 4) latest at/before engagement date (backward)
+    backward = pd.merge_asof(
+        remaining3.sort_values("asof_date"),
+        s_near,
+        left_on="asof_date",
+        right_on="asof_date",
+        by="customer_id",
+        direction="backward"
+    )
+    for c in sat_cols:
+        if c in backward.columns:
+            backward.rename(columns={c: f"{c}_sat"}, inplace=True)
+
+    # --- Concatenate all matched; rows still unmatched after step 4 will be dropped
+    matched_all = pd.concat([matched_exact, matched_month, matched_near, backward], ignore_index=True)
+
+    # Keep rows where we have at least some sat signal (region/contract is a good proxy)
+    have_sat = matched_all[[f"{c}_sat" for c in ["region_le","contract_type_le"] if f"{c}_sat" in matched_all.columns]].any(axis=1)
+    merged = matched_all[have_sat].copy()
+
+    return merged
+
 
 def _extract_customer_id(df):
     """
@@ -288,6 +392,12 @@ def main():
     eng = clean_engagement(eng_raw)
     sat = clean_satisfaction(sat_raw)
 
+    print(f"Engagement: raw={len(eng_raw):,} -> cleaned={len(eng):,}")
+    print(f"Satisfaction: raw={len(sat_raw):,} -> cleaned={len(sat):,}")
+    print(f"Distinct keys: eng={eng[['customer_id','asof_date']].drop_duplicates().shape[0]:,}, "
+      f"sat={sat[['customer_id','asof_date']].drop_duplicates().shape[0]:,}")
+
+
     # Deduplicate within each dataset by latest ingest
     key_cols = ["customer_id", "asof_date"]
     eng_latest = latest_per_key(eng, key_cols)
@@ -301,10 +411,15 @@ def main():
     _minmax_inplace(sat_latest, sat_norm_cols)
 
     # Merge (inner) on keys across latest snapshots
-    merged = pd.merge(
-        eng_latest, sat_latest,
-        on=key_cols, how="inner", suffixes=("_eng", "_sat")
-    )
+    print("Deduping to latest per (customer_id, asof_date)...")
+    key_cols = ["customer_id", "asof_date"]
+    eng_latest = latest_per_key(eng, key_cols)
+    sat_latest = latest_per_key(sat, key_cols)
+    print(f"Latest snapshots: eng={len(eng_latest):,}, sat={len(sat_latest):,}")
+
+    print("Merging progressively (exact date -> month -> nearest ±7d -> backward)...")
+    merged = _merge_progressive(eng_latest, sat_latest)
+    print(f"Merged rows after progressive join: {len(merged):,}")
 
     # Produce consolidated target
     merged["churned"] = merged.apply(consolidate_churn, axis=1).astype(int)
