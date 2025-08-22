@@ -1,0 +1,202 @@
+{
+  "spec_version": "1.0",
+  "metadata": {
+    "name": "dm4ml_churn_features_v1",
+    "generated_at_ist": "2025-08-22T00:00:00+05:30"
+  },
+  "entity_keys": ["customer_id", "asof_date"],
+  "point_in_time_col": "asof_date",
+  "leakage_guard": true,
+  "label": { "name": "churned", "type": "int", "use_only_as_label": true },
+
+  "drop_after": ["auto_renew_enabled_False", "auto_renew_enabled_True", "ingest_ts", "subscription_plan_le"],
+
+  "steps": [
+    {
+      "stage": "preprocess",
+      "steps": [
+        { "op": "parse_date", "col": "asof_date" },
+        { "op": "parse_date", "col": "signup_date" },
+        { "op": "parse_date", "col": "last_login_date", "errors": "keep_null" },
+
+        {
+          "op": "derive",
+          "name": "auto_renew_enabled",
+          "expr": "CASE WHEN auto_renew_enabled_True == true THEN 1 WHEN auto_renew_enabled_False == true THEN 0 ELSE NULL END",
+          "type": "int"
+        },
+        { "op": "flag_missing", "name": "auto_renew_enabled_missing", "on": "auto_renew_enabled" },
+        { "op": "impute", "on": "auto_renew_enabled", "strategy": "mode" },
+
+        {
+          "op": "one_hot_from_int",
+          "source": "subscription_plan_le",
+          "prefix": "plan_",
+          "values": [0, 1, 2],
+          "drop_source": false
+        }
+      ]
+    },
+
+    {
+      "stage": "row_level_features",
+      "steps": [
+        {
+          "op": "derive", "name": "tenure_days",
+          "expr": "DATEDIFF_DAY(asof_date, signup_date)", "type": "int"
+        },
+        {
+          "op": "derive", "name": "last_login_missing",
+          "expr": "ISNULL(last_login_date) OR (last_login_date == '')", "type": "int"
+        },
+        {
+          "op": "derive", "name": "days_since_last_login",
+          "expr": "CASE WHEN last_login_missing == 1 THEN 9999 ELSE DATEDIFF_DAY(asof_date, last_login_date) END",
+          "type": "int"
+        },
+
+        { "op": "derive", "name": "inactive_30d", "expr": "days_since_last_login > 30", "type": "int" },
+        { "op": "derive", "name": "inactive_90d", "expr": "days_since_last_login > 90", "type": "int" },
+        { "op": "derive", "name": "new_user_30d", "expr": "tenure_days <= 30", "type": "int" },
+
+        {
+          "op": "derive", "name": "tickets_per_30d",
+          "expr": "support_tickets_last_90d / 3.0", "type": "float"
+        },
+        {
+          "op": "derive", "name": "session_hours",
+          "expr": "avg_session_length_minutes / 60.0", "type": "float"
+        },
+        {
+          "op": "rename",
+          "from": "email_opens_last_30d",
+          "to": "email_open_rate_30d"
+        },
+
+        {
+          "op": "derive", "name": "asof_month",
+          "expr": "MONTH(asof_date)", "type": "int"
+        },
+        {
+          "op": "derive", "name": "asof_month_sin",
+          "expr": "SIN(2 * PI() * asof_month / 12.0)", "type": "float"
+        },
+        {
+          "op": "derive", "name": "asof_month_cos",
+          "expr": "COS(2 * PI() * asof_month / 12.0)", "type": "float"
+        },
+
+        { "op": "derive", "name": "auto_renew_off", "expr": "auto_renew_enabled == 0", "type": "int" },
+        {
+          "op": "derive", "name": "auto_renew_off_and_inactive_30d",
+          "expr": "auto_renew_off * inactive_30d", "type": "int"
+        }
+      ]
+    },
+
+    {
+      "stage": "interactions",
+      "steps": [
+        {
+          "op": "derive", "name": "tenure_x_auto_renew_off",
+          "expr": "tenure_days * auto_renew_off", "type": "float"
+        },
+        {
+          "op": "derive", "name": "inactivity_x_email",
+          "expr": "days_since_last_login * (1 - email_open_rate_30d)", "type": "float"
+        },
+        {
+          "op": "derive", "name": "tickets_x_recency",
+          "expr": "tickets_per_30d * inactive_30d", "type": "float"
+        }
+      ]
+    },
+
+    {
+      "stage": "trend_features_optional",
+      "when": "HAS_MULTIPLE_SNAPSHOTS_PER_CUSTOMER",
+      "group_by": "customer_id",
+      "order_by": "asof_date",
+      "steps": [
+        {
+          "op": "lag", "name": "lag_email_open_rate_30d",
+          "source": "email_open_rate_30d", "k": 1
+        },
+        {
+          "op": "lag", "name": "lag_session_hours",
+          "source": "session_hours", "k": 1
+        },
+        {
+          "op": "lag", "name": "lag_tickets_per_30d",
+          "source": "tickets_per_30d", "k": 1
+        },
+
+        {
+          "op": "derive", "name": "delta_email_opens_30d",
+          "expr": "email_open_rate_30d - lag_email_open_rate_30d", "type": "float"
+        },
+        {
+          "op": "derive", "name": "delta_session_hours",
+          "expr": "session_hours - lag_session_hours", "type": "float"
+        },
+        {
+          "op": "derive", "name": "delta_tickets_30d",
+          "expr": "tickets_per_30d - lag_tickets_per_30d", "type": "float"
+        },
+
+        {
+          "op": "rolling_mean",
+          "name": "rollmean_email_3",
+          "source": "email_open_rate_30d",
+          "window": 3, "min_periods": 2
+        },
+        {
+          "op": "rolling_mean",
+          "name": "rollmean_session_3",
+          "source": "session_hours",
+          "window": 3, "min_periods": 2
+        },
+        {
+          "op": "rolling_mean",
+          "name": "rollmean_tickets_3",
+          "source": "tickets_per_30d",
+          "window": 3, "min_periods": 2
+        }
+      ]
+    },
+
+    {
+      "stage": "scaling_and_clipping",
+      "notes": "Persist scalers fitted on train only. Exclude sentinel 9999 from any scaling.",
+      "profiles": {
+        "linear_baseline": [
+          { "op": "zscore", "cols": ["session_hours", "email_open_rate_30d", "tickets_per_30d", "monthly_spend"], "skip_if_in_01": true },
+          { "op": "robust_log1p_then_clip_p99", "cols": ["tenure_days", "days_since_last_login"], "exclude_values_equals": 9999 }
+        ],
+        "tree_baseline": [
+          { "op": "clip_p99", "cols": ["tenure_days", "days_since_last_login", "tickets_per_30d"] }
+        ]
+      }
+    }
+  ],
+
+  "final_feature_list": [
+    "plan_0", "plan_1", "plan_2",
+    "tenure_days", "days_since_last_login", "last_login_missing",
+    "inactive_30d", "inactive_90d", "new_user_30d",
+    "tickets_per_30d", "session_hours", "email_open_rate_30d",
+    "asof_month_sin", "asof_month_cos",
+    "auto_renew_enabled", "auto_renew_off", "auto_renew_off_and_inactive_30d",
+    "tenure_x_auto_renew_off", "inactivity_x_email", "tickets_x_recency",
+    "delta_email_opens_30d", "delta_session_hours", "delta_tickets_30d",
+    "rollmean_email_3", "rollmean_session_3", "rollmean_tickets_3",
+    "auto_renew_enabled_missing",
+    "monthly_spend"
+  ],
+
+  "export": {
+    "table_name": "features_churn_v1",
+    "keys": ["customer_id", "asof_date"],
+    "label": "churned"
+  }
+}

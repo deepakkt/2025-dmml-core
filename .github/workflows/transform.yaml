@@ -1,0 +1,443 @@
+name: Transform features and store
+
+on:
+  workflow_dispatch:
+
+jobs:
+  transform-and-store:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      DATA_REPO: 2025-dmml-data
+      CORE_REPO: 2025-dmml-core
+      DATA_DIR: prepared-data
+      OUT_DIR: transformed-data
+      TABLE_NAME: features_churn_v1
+      PROFILE: tree_baseline  # or linear_baseline
+
+    steps:
+      - name: Checkout core repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy python-dateutil
+
+      - name: Make transformer path and drop spec
+        shell: bash
+        run: |
+          mkdir -p tools/data_transformation
+          # Save the feature spec attached in chat to your repo workspace so the script can read it.
+          # If you already keep this file in-repo, delete this step and just commit that file there.
+          cat > tools/data_transformation/feature_spec.json <<'JSON'
+          {
+            "spec_version": "1.0",
+            "metadata": { "name": "dm4ml_churn_features_v1", "generated_at_ist": "2025-08-22T00:00:00+05:30" },
+            "entity_keys": ["customer_id", "asof_date"],
+            "point_in_time_col": "asof_date",
+            "leakage_guard": true,
+            "label": { "name": "churned", "type": "int", "use_only_as_label": true },
+            "drop_after": ["auto_renew_enabled_False","auto_renew_enabled_True","ingest_ts","subscription_plan_le"],
+            "steps": [
+              {
+                "stage": "preprocess",
+                "steps": [
+                  {"op":"parse_date","col":"asof_date"},
+                  {"op":"parse_date","col":"signup_date"},
+                  {"op":"parse_date","col":"last_login_date","errors":"keep_null"},
+                  {"op":"derive","name":"auto_renew_enabled","expr":"CASE WHEN auto_renew_enabled_True == true THEN 1 WHEN auto_renew_enabled_False == true THEN 0 ELSE NULL END","type":"int"},
+                  {"op":"flag_missing","name":"auto_renew_enabled_missing","on":"auto_renew_enabled"},
+                  {"op":"impute","on":"auto_renew_enabled","strategy":"mode"},
+                  {"op":"one_hot_from_int","source":"subscription_plan_le","prefix":"plan_","values":[0,1,2],"drop_source":false}
+                ]
+              },
+              {
+                "stage":"row_level_features",
+                "steps":[
+                  {"op":"derive","name":"tenure_days","expr":"DATEDIFF_DAY(asof_date, signup_date)","type":"int"},
+                  {"op":"derive","name":"last_login_missing","expr":"ISNULL(last_login_date) OR (last_login_date == '')","type":"int"},
+                  {"op":"derive","name":"days_since_last_login","expr":"CASE WHEN last_login_missing == 1 THEN 9999 ELSE DATEDIFF_DAY(asof_date, last_login_date) END","type":"int"},
+                  {"op":"derive","name":"inactive_30d","expr":"days_since_last_login > 30","type":"int"},
+                  {"op":"derive","name":"inactive_90d","expr":"days_since_last_login > 90","type":"int"},
+                  {"op":"derive","name":"new_user_30d","expr":"tenure_days <= 30","type":"int"},
+                  {"op":"derive","name":"tickets_per_30d","expr":"support_tickets_last_90d / 3.0","type":"float"},
+                  {"op":"derive","name":"session_hours","expr":"avg_session_length_minutes / 60.0","type":"float"},
+                  {"op":"rename","from":"email_opens_last_30d","to":"email_open_rate_30d"},
+                  {"op":"derive","name":"asof_month","expr":"MONTH(asof_date)","type":"int"},
+                  {"op":"derive","name":"asof_month_sin","expr":"SIN(2 * PI() * asof_month / 12.0)","type":"float"},
+                  {"op":"derive","name":"asof_month_cos","expr":"COS(2 * PI() * asof_month / 12.0)","type":"float"},
+                  {"op":"derive","name":"auto_renew_off","expr":"auto_renew_enabled == 0","type":"int"},
+                  {"op":"derive","name":"auto_renew_off_and_inactive_30d","expr":"auto_renew_off * inactive_30d","type":"int"}
+                ]
+              },
+              {
+                "stage":"interactions",
+                "steps":[
+                  {"op":"derive","name":"tenure_x_auto_renew_off","expr":"tenure_days * auto_renew_off","type":"float"},
+                  {"op":"derive","name":"inactivity_x_email","expr":"days_since_last_login * (1 - email_open_rate_30d)","type":"float"},
+                  {"op":"derive","name":"tickets_x_recency","expr":"tickets_per_30d * inactive_30d","type":"float"}
+                ]
+              },
+              {
+                "stage":"trend_features_optional",
+                "when":"HAS_MULTIPLE_SNAPSHOTS_PER_CUSTOMER",
+                "group_by":"customer_id",
+                "order_by":"asof_date",
+                "steps":[
+                  {"op":"lag","name":"lag_email_open_rate_30d","source":"email_open_rate_30d","k":1},
+                  {"op":"lag","name":"lag_session_hours","source":"session_hours","k":1},
+                  {"op":"lag","name":"lag_tickets_per_30d","source":"tickets_per_30d","k":1},
+                  {"op":"derive","name":"delta_email_opens_30d","expr":"email_open_rate_30d - lag_email_open_rate_30d","type":"float"},
+                  {"op":"derive","name":"delta_session_hours","expr":"session_hours - lag_session_hours","type":"float"},
+                  {"op":"derive","name":"delta_tickets_30d","expr":"tickets_per_30d - lag_tickets_per_30d","type":"float"},
+                  {"op":"rolling_mean","name":"rollmean_email_3","source":"email_open_rate_30d","window":3,"min_periods":2},
+                  {"op":"rolling_mean","name":"rollmean_session_3","source":"session_hours","window":3,"min_periods":2},
+                  {"op":"rolling_mean","name":"rollmean_tickets_3","source":"tickets_per_30d","window":3,"min_periods":2}
+                ]
+              },
+              {
+                "stage":"scaling_and_clipping",
+                "profiles":{
+                  "linear_baseline":[
+                    {"op":"zscore","cols":["session_hours","email_open_rate_30d","tickets_per_30d","monthly_spend"],"skip_if_in_01":true},
+                    {"op":"robust_log1p_then_clip_p99","cols":["tenure_days","days_since_last_login"],"exclude_values_equals":9999}
+                  ],
+                  "tree_baseline":[
+                    {"op":"clip_p99","cols":["tenure_days","days_since_last_login","tickets_per_30d"]}
+                  ]
+                }
+              }
+            ],
+            "final_feature_list":[
+              "plan_0","plan_1","plan_2",
+              "tenure_days","days_since_last_login","last_login_missing",
+              "inactive_30d","inactive_90d","new_user_30d",
+              "tickets_per_30d","session_hours","email_open_rate_30d",
+              "asof_month_sin","asof_month_cos",
+              "auto_renew_enabled","auto_renew_off","auto_renew_off_and_inactive_30d",
+              "tenure_x_auto_renew_off","inactivity_x_email","tickets_x_recency",
+              "delta_email_opens_30d","delta_session_hours","delta_tickets_30d",
+              "rollmean_email_3","rollmean_session_3","rollmean_tickets_3",
+              "auto_renew_enabled_missing",
+              "monthly_spend"
+            ],
+            "export":{"table_name":"features_churn_v1","keys":["customer_id","asof_date"],"label":"churned"}
+          }
+          JSON
+
+      - name: Write transformer script
+        shell: bash
+        run: |
+          cat > tools/data_transformation/transform_features.py <<'PY'
+          #!/usr/bin/env python3
+          import argparse, json, sqlite3, math, sys, logging
+          from pathlib import Path
+          import numpy as np
+          import pandas as pd
+          from dateutil import tz
+
+          logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
+          # ---------- helpers ----------
+          def parse_args():
+              ap = argparse.ArgumentParser()
+              ap.add_argument("--spec", required=True)
+              ap.add_argument("--input", required=True)   # prepared.csv
+              ap.add_argument("--out-csv", required=True)
+              ap.add_argument("--out-sqlite", required=True)
+              ap.add_argument("--table-name", required=False, default=None)
+              ap.add_argument("--profile", required=False, default=None, help="scaling profile: tree_baseline or linear_baseline")
+              return ap.parse_args()
+
+          def datediff_day(a, b):
+              return (a - b).dt.days
+
+          def month_of(d):
+              return d.dt.month
+
+          def ensure_int(x):
+              return x.astype("Int64") if x.isna().any() else x.astype(int)
+
+          def isnull(s):
+              return s.isna()
+
+          def _case_when(df, expr, env):
+              # very small CASE WHEN parser: CASE WHEN <cond1> THEN <v1> WHEN <cond2> THEN <v2> ELSE <vE> END
+              body = expr.strip()[len("CASE "):].rsplit(" END", 1)[0]
+              parts = []
+              rest = body
+              choices = []
+              conds = []
+              default = None
+              while rest.strip().startswith("WHEN"):
+                  rest = rest.strip()[len("WHEN "):]
+                  cond, after = rest.split(" THEN ", 1)
+                  if " WHEN " in after:
+                      val, rest = after.split(" WHEN ", 1)
+                      rest = "WHEN " + rest
+                  else:
+                      # last THEN ... [ELSE ...]
+                      if " ELSE " in after:
+                          val, default = after.split(" ELSE ", 1)
+                      else:
+                          val, default = after, "None"
+                      rest = ""
+                  conds.append(pd_eval(df, cond.strip(), env))
+                  choices.append(pd_eval(df, val.strip(), env))
+              if default is None:
+                  default = "None"
+              default_val = pd_eval(df, default.strip(), env)
+              import numpy as np
+              return np.select(conds, choices, default=default_val)
+
+          def pd_eval(df, expr, env):
+              expr = expr.strip()
+              if expr.upper().startswith("CASE "):
+                  return _case_when(df, expr, env)
+              # normalize operators and literals
+              expr_py = (expr.replace(" AND ", " & ").replace(" OR ", " | ")
+                              .replace("== true", "== True").replace("== false", "== False"))
+              # map column names into env by bare identifiers; we allow df[col] by providing env[col]
+              return eval(expr_py, {**ENV_FUNCS}, {**env})
+
+          ENV_FUNCS = {
+              "DATEDIFF_DAY": datediff_day,
+              "MONTH": month_of,
+              "SIN": np.sin,
+              "COS": np.cos,
+              "PI": (lambda: math.pi),
+              "ISNULL": isnull
+          }
+
+          def run():
+              args = parse_args()
+              spec = json.loads(Path(args.spec).read_text())
+              table_name = args.table_name or spec["export"]["table_name"]
+              profile = args.profile or None
+
+              df = pd.read_csv(args.input)
+              # ensure date parsing per spec
+              # build env mapping (columns become variables)
+              def refresh_env():
+                  return {c: df[c] for c in df.columns}
+
+              # --- preprocess
+              for stage in spec["steps"]:
+                  if stage["stage"] == "preprocess":
+                      for step in stage["steps"]:
+                          op = step["op"]
+                          if op == "parse_date":
+                              col = step["col"]
+                              errors = step.get("errors", "raise")
+                              # keep empty/None as NaT if keep_null requested
+                              df[col] = pd.to_datetime(df[col], errors=("coerce" if errors=="keep_null" else "raise"))
+                          elif op == "derive" and step["name"] == "auto_renew_enabled":
+                              env = refresh_env()
+                              df["auto_renew_enabled"] = pd.Series(pd_eval(df, step["expr"], env)).astype("Float64")
+                              # keep as int later after impute
+                          elif op == "flag_missing":
+                              on = step["on"]
+                              name = step["name"]
+                              df[name] = df[on].isna().astype(int)
+                          elif op == "impute":
+                              on = step["on"]; strategy = step["strategy"]
+                              if strategy == "mode":
+                                  mode = df[on].mode(dropna=True)
+                                  fill = mode.iloc[0] if len(mode) else 0
+                                  df[on] = df[on].fillna(fill).astype(int)
+                              else:
+                                  raise NotImplementedError("impute: " + strategy)
+                          elif op == "one_hot_from_int":
+                              src = step["source"]; pref = step["prefix"]; vals = step["values"]
+                              for v in vals:
+                                  df[f"{pref}{v}"] = (df[src] == v).astype(int)
+                              if step.get("drop_source", False):
+                                  df.drop(columns=[src], inplace=True)
+
+              # --- row level features, interactions, trends, scaling
+              def apply_steps(steps):
+                  for st in steps:
+                      op = st["op"]
+                      if op == "derive":
+                          name = st["name"]; expr = st["expr"]
+                          env = refresh_env()
+                          val = pd_eval(df, expr, env)
+                          if st.get("type") == "int":
+                              df[name] = pd.Series(val).astype(int)
+                          elif st.get("type") == "float":
+                              df[name] = pd.Series(val).astype(float)
+                          else:
+                              df[name] = val
+                      elif op == "rename":
+                          df.rename(columns={st["from"]: st["to"]}, inplace=True)
+                      else:
+                          raise NotImplementedError(op)
+
+              # row_level_features
+              for stage in spec["steps"]:
+                  if stage["stage"] == "row_level_features":
+                      apply_steps(stage["steps"])
+
+              # interactions
+              for stage in spec["steps"]:
+                  if stage["stage"] == "interactions":
+                      apply_steps(stage["steps"])
+
+              # trend_features_optional
+              multi = df.groupby("customer_id")["asof_date"].transform("count").gt(1).any()
+              for stage in spec["steps"]:
+                  if stage["stage"] == "trend_features_optional":
+                      if stage.get("when") == "HAS_MULTIPLE_SNAPSHOTS_PER_CUSTOMER" and not multi:
+                          continue
+                      group_col = stage["group_by"]; order_by = stage["order_by"]
+                      df = df.sort_values([group_col, order_by])
+                      for st in stage["steps"]:
+                          op = st["op"]
+                          if op == "lag":
+                              name = st["name"]; src = st["source"]; k = int(st["k"])
+                              df[name] = df.groupby(group_col, sort=True)[src].shift(k)
+                          elif op == "derive":
+                              name = st["name"]; expr = st["expr"]
+                              env = refresh_env()
+                              df[name] = pd_eval(df, expr, env)
+                          elif op == "rolling_mean":
+                              name = st["name"]; src = st["source"]
+                              window = int(st["window"]); minp = int(st.get("min_periods", window))
+                              df[name] = (df
+                                          .groupby(group_col, sort=True)[src]
+                                          .rolling(window, min_periods=minp)
+                                          .mean()
+                                          .reset_index(level=0, drop=True))
+                          else:
+                              raise NotImplementedError(op)
+
+              # drop-after
+              for col in spec.get("drop_after", []):
+                  if col in df.columns:
+                      df.drop(columns=[col], inplace=True)
+
+              # scaling_and_clipping profiles
+              def clip_p99_cols(cols):
+                  for c in cols:
+                      if c in df.columns:
+                          low = df[c].quantile(0.01)
+                          high = df[c].quantile(0.99)
+                          df[c] = df[c].clip(lower=low, upper=high)
+
+              def zscore_cols(cols, skip_if_in_01=False):
+                  for c in cols:
+                      if c not in df.columns: 
+                          continue
+                      if skip_if_in_01 and df[c].min() >= 0 and df[c].max() <= 1:
+                          continue
+                      mu = df[c].mean()
+                      sd = df[c].std(ddof=0) or 1.0
+                      df[c] = (df[c] - mu) / sd
+
+              def robust_log1p_then_clip(cols, exclude_value=None):
+                  for c in cols:
+                      if c not in df.columns: 
+                          continue
+                      mask = True
+                      if exclude_value is not None:
+                          mask = df[c] != exclude_value
+                      x = df.loc[mask, c]
+                      x = np.log1p(x.clip(lower=0))
+                      p99 = np.nanpercentile(x, 99)
+                      x = np.clip(x, None, p99)
+                      df.loc[mask, c] = x
+
+              for stage in spec["steps"]:
+                  if stage["stage"] == "scaling_and_clipping" and profile:
+                      prof = stage.get("profiles", {}).get(profile)
+                      if prof:
+                          for opdef in prof:
+                              op = opdef["op"]
+                              if op == "clip_p99":
+                                  clip_p99_cols(opdef["cols"])
+                              elif op == "zscore":
+                                  zscore_cols(opdef["cols"], opdef.get("skip_if_in_01", False))
+                              elif op == "robust_log1p_then_clip_p99":
+                                  robust_log1p_then_clip(opdef["cols"], opdef.get("exclude_values_equals"))
+                              else:
+                                  raise NotImplementedError(op)
+
+              # final selection
+              keys = spec["export"]["keys"]
+              label = spec["export"]["label"]
+              final_cols = keys + spec["final_feature_list"] + [label]
+              missing = [c for c in final_cols if c not in df.columns]
+              if missing:
+                  raise RuntimeError(f"Missing expected columns in final output: {missing}")
+              out = df[final_cols].copy()
+
+              # ensure asof_date string for portability; keep also as DATE in sqlite
+              if "asof_date" in out.columns:
+                  out["asof_date"] = pd.to_datetime(out["asof_date"]).dt.strftime("%Y-%m-%d")
+
+              # write CSV
+              Path(args.out_csv).parent.mkdir(parents=True, exist_ok=True)
+              out.to_csv(args.out_csv, index=False)
+
+              # write SQLite
+              Path(args.out_sqlite).parent.mkdir(parents=True, exist_ok=True)
+              conn = sqlite3.connect(args.out_sqlite)
+              # We’ll store as a table with name from spec/export
+              # Cast dates back to DATE via a temp frame
+              out_sql = out.copy()
+              out_sql["asof_date"] = pd.to_datetime(out_sql["asof_date"])
+              out_sql.to_sql(table_name, conn, if_exists="replace", index=False)
+              # create a unique index on keys for fast point lookups
+              try:
+                  cols = ",".join(spec["export"]["keys"])
+                  conn.execute(f"CREATE UNIQUE INDEX IF NOT EXISTS idx_{table_name}_keys ON {table_name} ({cols});")
+              except Exception as e:
+                  logging.warning("Index creation failed: %s", e)
+              conn.commit(); conn.close()
+              logging.info("Wrote %s and %s", args.out_csv, args.out_sqlite)
+
+          if __name__ == "__main__":
+              run()
+          PY
+          chmod +x tools/data_transformation/transform_features.py
+
+      - name: Clone data repo (read/write)
+        shell: bash
+        run: |
+          git clone https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${{ github.repository_owner }}/${{ env.DATA_REPO }}.git ../${{ env.DATA_REPO }}
+
+      - name: Run transformation
+        shell: bash
+        run: |
+          python tools/data_transformation/transform_features.py \
+            --spec tools/data_transformation/feature_spec.json \
+            --input ../${{ env.DATA_REPO }}/${{ env.DATA_DIR }}/prepared.csv \
+            --out-csv ../${{ env.DATA_REPO }}/${{ env.OUT_DIR }}/transformed.csv \
+            --out-sqlite ../${{ env.DATA_REPO }}/${{ env.OUT_DIR }}/transformed.sqlite \
+            --table-name $TABLE_NAME \
+            --profile $PROFILE
+
+      - name: Commit & push outputs to data repo
+        working-directory: ../${{ env.DATA_REPO }}
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p ${{ env.OUT_DIR }}
+          git add ${{ env.OUT_DIR }}/transformed.csv ${{ env.OUT_DIR }}/transformed.sqlite || true
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(transform): update transformed outputs ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))"
+            git push origin HEAD
+          else
+            echo "No changes to commit."
+          fi
+
