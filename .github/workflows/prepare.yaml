@@ -1,0 +1,60 @@
+name: Data Preparation — Merge & Clean
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-and-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      DATA_REPO_OWNER: ${{ github.repository_owner }}
+      DATA_REPO_NAME: 2025-dmml-data
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Checkout core repo (this repo)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas python-dateutil
+
+      - name: Checkout data repo (2025-dmml-data)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: data-repo
+
+      - name: Run data cleaner
+        run: |
+          python tools/data_cleaner/prepare_data.py --data-repo "$(pwd)/data-repo"
+
+      - name: Commit & push prepared.csv to data repo
+        working-directory: data-repo
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create folder if missing and add file
+          mkdir -p prepared-data
+          if [ ! -f prepared-data/prepared.csv ]; then
+            echo "prepared-data/prepared.csv not found; data cleaner should have created it." >&2
+            exit 1
+          fi
+
+          git add prepared-data/prepared.csv
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Data prep: update prepared.csv (run: $GITHUB_RUN_ID)"
+            # Adjust branch if your data repo default is not 'main'
+            git push origin HEAD:main
+          fi
