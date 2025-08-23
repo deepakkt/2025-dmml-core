@@ -1,0 +1,422 @@
+name: Orchestrate DM4ML Pipeline (ingest → train)
+
+on:
+  workflow_dispatch: {}   # manual kick-off
+
+permissions:
+  contents: write
+
+env:
+  DATA_REPO_OWNER: ${{ github.repository_owner }}
+  DATA_REPO_NAME: 2025-dmml-data
+  MAIN_BRANCH: main
+
+jobs:
+  # 1) INGEST
+  ingest:
+    runs-on: ubuntu-latest
+    env:
+      SCHEMA_ENGAGEMENT: ${{ vars.SCHEMA_ENGAGEMENT }}
+      SCHEMA_SATISFACTION: ${{ vars.SCHEMA_SATISFACTION }}
+      MOCKAROO_KEY: ${{ secrets.MOCKAROO_KEY }}
+      COUNT: "1000"
+    steps:
+      - name: Checkout workflow repo
+        uses: actions/checkout@v4
+
+      - name: Verify required inputs
+        run: |
+          set -euo pipefail
+          missing=0
+          for v in SCHEMA_ENGAGEMENT SCHEMA_SATISFACTION; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::Repository variable '$v' is not set"; missing=1
+            fi
+          done
+          if [ -z "${MOCKAROO_KEY:-}" ]; then
+            echo "::error::Secret 'MOCKAROO_KEY' is not set"; missing=1
+          fi
+          if [ -z "${{ secrets.DATA_REPO_TOKEN }}" ]; then
+            echo "::error::Secret 'DATA_REPO_TOKEN' is not set"; missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then exit 1; fi
+
+      - name: Clone target data repo
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}.git" data-repo
+          cd data-repo
+          git checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"
+
+      - name: Fetch Mockaroo JSONs via Python (stdlib only)
+        run: |
+          set -euo pipefail
+          python3 - << 'PY'
+          import os, json, time
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          from urllib.error import URLError, HTTPError
+
+          SCHEMA_ENGAGEMENT = os.environ["SCHEMA_ENGAGEMENT"]
+          SCHEMA_SATISFACTION = os.environ["SCHEMA_SATISFACTION"]
+          MOCKAROO_KEY = os.environ["MOCKAROO_KEY"]
+          COUNT = os.environ.get("COUNT","1000")
+          base_dir = Path("data-repo")
+
+          def http_get_json(url: str, tries: int = 5, backoff: float = 1.5):
+            last_err = None
+            for i in range(1, tries+1):
+              try:
+                req = Request(url, headers={"User-Agent":"gh-actions-mockaroo-ingest/1.0"})
+                with urlopen(req, timeout=60) as resp:
+                  data = resp.read()
+                return json.loads(data)
+              except (HTTPError, URLError, json.JSONDecodeError) as e:
+                last_err = e
+                if i < tries:
+                  time.sleep(backoff ** i)
+                else:
+                  raise
+            raise last_err
+
+          def save_dataset(kind: str, schema_id: str, key: str, ts_dir: Path):
+            url = f"https://api.mockaroo.com/api/{schema_id}?count={COUNT}&key={key}"
+            payload = http_get_json(url)
+            out_file = ts_dir / kind / "data.json"
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            with out_file.open("w", encoding="utf-8") as f:
+              json.dump(payload, f, ensure_ascii=False, indent=2)
+            print(f"Wrote {kind} -> {out_file} (records: {len(payload) if isinstance(payload, list) else 'n/a'})")
+
+          ts = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H:%M:%S")
+          ts_dir = base_dir / "raw-data" / ts
+
+          save_dataset("engagement", SCHEMA_ENGAGEMENT, MOCKAROO_KEY, ts_dir)
+          save_dataset("satisfaction", SCHEMA_SATISFACTION, MOCKAROO_KEY, ts_dir)
+
+          with open(base_dir / ".ingest_ts", "w", encoding="utf-8") as f:
+            f.write(ts)
+          PY
+
+      - name: Stage, commit, and push
+        run: |
+          set -euo pipefail
+          TS="$(cat data-repo/.ingest_ts)"
+          cd data-repo
+          git config --global --add safe.directory "$PWD"
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Ingest raw data: ${TS}"
+          git push origin "HEAD:${MAIN_BRANCH}"
+
+  # 2) VALIDATE
+  validate:
+    runs-on: ubuntu-latest
+    needs: [ingest]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install requirements
+        run: |
+          set -euo pipefail
+          if [ -f tools/data_validation_reporter/requirements.txt ]; then
+            python -m pip install -r tools/data_validation_reporter/requirements.txt
+          else
+            python -m pip install pandas
+          fi
+
+      - name: Clone target data repo
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}.git" data-repo
+          cd data-repo
+          git checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"
+
+      - name: Run Data Validation Reporter
+        run: |
+          set -euo pipefail
+          python tools/data_validation_reporter/main.py --data-repo data-repo
+
+      - name: Commit & push reports (if any)
+        run: |
+          set -euo pipefail
+          cd data-repo
+          git config --global --add safe.directory "$PWD"
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new validation reports to commit."
+            exit 0
+          fi
+          git commit -m "Add data_cleansing_report.csv for new ingests"
+          git push origin "HEAD:${MAIN_BRANCH}"
+
+  # 3) PREPARE
+  prepare:
+    runs-on: ubuntu-latest
+    needs: [validate]
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Checkout core repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas python-dateutil
+
+      - name: Checkout data repo (write)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: data-repo
+
+      - name: Run data cleaner
+        run: |
+          python tools/data_cleaner/prepare_data.py --data-repo "$(pwd)/data-repo"
+
+      - name: Commit & push prepared.csv
+        working-directory: data-repo
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p prepared-data
+          test -f prepared-data/prepared.csv
+          git add prepared-data/prepared.csv
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Data prep: update prepared.csv (run: $GITHUB_RUN_ID)"
+            git push origin HEAD:${MAIN_BRANCH}
+          fi
+
+  # 4) TRANSFORM
+  transform:
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    permissions:
+      contents: write
+    env:
+      DATA_REPO: ${{ env.DATA_REPO_NAME }}
+      OUT_DIR: transformed-data
+      SPEC_PATH: tools/data_transformation/feature_spec.json
+      SCRIPT_PATH: tools/data_transformation/transform_features.py
+      TABLE_NAME: features_churn_v1
+      PROFILE: tree_baseline
+    steps:
+      - name: Checkout core repo
+        uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          test -f "$SPEC_PATH" || (echo "Missing spec at $SPEC_PATH" && exit 1)
+          test -f "$SCRIPT_PATH" || (echo "Missing transformer at $SCRIPT_PATH" && exit 1)
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy python-dateutil
+
+      - name: Clone data repo (read/write)
+        run: |
+          git clone \
+            https://x-access-token:${{ secrets.DATA_REPO_TOKEN }}@github.com/${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO }}.git \
+            ../${{ env.DATA_REPO }}
+
+      - name: Run transformation
+        run: |
+          python "$SCRIPT_PATH" \
+            --spec "$SPEC_PATH" \
+            --input "../${{ env.DATA_REPO }}/prepared-data/prepared.csv" \
+            --out-csv "../${{ env.DATA_REPO }}/${{ env.OUT_DIR }}/transformed.csv" \
+            --out-sqlite "../${{ env.DATA_REPO }}/${{ env.OUT_DIR }}/transformed.sqlite" \
+            --table-name "$TABLE_NAME" \
+            --profile "$PROFILE"
+
+      - name: Commit & push transformed outputs
+        working-directory: ../${{ env.DATA_REPO }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p "${{ env.OUT_DIR }}"
+          git add "${{ env.OUT_DIR }}/transformed.csv" "${{ env.OUT_DIR }}/transformed.sqlite" || true
+          if ! git diff --cached --quiet; then
+            git commit -m "feat(transform): update transformed outputs ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))"
+            git push origin HEAD:${MAIN_BRANCH}
+          else
+            echo "No changes to commit."
+          fi
+
+  # 5) FEATURE STORE
+  feature_store:
+    runs-on: ubuntu-latest
+    needs: [transform]
+    permissions:
+      contents: write
+    services:
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping || exit 1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Checkout core repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps (pinned)
+        run: |
+          python -m pip install --upgrade "pip<25" setuptools wheel
+          pip install \
+            "pandas==2.2.2" \
+            "dask[dataframe]==2024.8.1" \
+            "pyarrow==17.0.0" \
+            "feast==0.52.0" \
+            "redis==5.0.7" \
+            "python-dateutil>=2.8.2"
+
+      - name: Checkout data repo (2025-dmml-data)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: data-repo
+
+      - name: Wait for Redis
+        run: |
+          python - <<'PY'
+          import time, redis
+          for i in range(30):
+              try:
+                  r = redis.Redis(host='localhost', port=6379, db=0)
+                  r.ping()
+                  print("Redis is ready"); break
+              except Exception as e:
+                  print("Waiting for Redis...", e); time.sleep(2)
+          else:
+              raise SystemExit("Redis not ready")
+          PY
+
+      - name: Build/apply/materialize Feast repo + generate catalog
+        run: |
+          python tools/feature_store/build_feature_store.py \
+            --data-repo ./data-repo \
+            --repo-path ./feature_repo \
+            --redis "localhost:6379,db=0" \
+            --apply \
+            --materialize \
+            --generate-catalog
+
+      - name: Commit & push generated docs (this repo)
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_BRANCH: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global --add safe.directory "$PWD"
+          git add docs/FEATURE_CATALOG.md docs/feature_catalog.csv || true
+          if git diff --cached --quiet; then
+            echo "No catalog changes."; exit 0
+          fi
+          git commit -m "feat(feast): update feature catalog"
+          TOKEN="${GITHUB_TOKEN:-${DATA_REPO_TOKEN:-}}"
+          if [ -z "$TOKEN" ]; then echo "No token available to push"; exit 1; fi
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${GH_REPO}.git"
+          git push origin "HEAD:${GH_BRANCH}"
+
+  # 6) TRAIN
+  train:
+    runs-on: ubuntu-latest
+    needs: [feature_store]
+    env:
+      CORE_SHA: ${{ github.sha }}
+      DATA_REPO_PATH: data-repo
+      MODEL_VERSION: v0.1.0
+    steps:
+      - name: Checkout core repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout data repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}
+          path: ${{ env.DATA_REPO_PATH }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install scikit-learn pandas numpy joblib pyyaml
+
+      - name: Train model using transformed.csv
+        env:
+          GITHUB_SHA: ${{ env.CORE_SHA }}
+        run: |
+          python tools/model-training/train.py \
+            --data-repo "${{ github.workspace }}/${{ env.DATA_REPO_PATH }}" \
+            --out-subdir "models/churn" \
+            --version "${{ env.MODEL_VERSION }}"
+
+      - name: Configure git author for data repo
+        run: |
+          git -C "${{ env.DATA_REPO_PATH }}" config user.name  "github-actions[bot]"
+          git -C "${{ env.DATA_REPO_PATH }}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit & push model artifacts
+        run: |
+          set -euo pipefail
+          CHANGED=0
+          git -C "${{ env.DATA_REPO_PATH }}" add models/churn || true
+          git -C "${{ env.DATA_REPO_PATH }}" diff --cached --quiet || CHANGED=1
+          if [ "$CHANGED" -eq 1 ]; then
+            git -C "${{ env.DATA_REPO_PATH }}" commit -m "feat(model): add/update churn model artifacts"
+            git -C "${{ env.DATA_REPO_PATH }}" push
+          else
+            echo "No model changes."
+          fi
