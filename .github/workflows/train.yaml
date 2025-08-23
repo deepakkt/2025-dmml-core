@@ -1,0 +1,70 @@
+# .github/workflows/train-churn-model.yml
+name: Train Churn Model (Section 9)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    env:
+      CORE_SHA: ${{ github.sha }}
+      DATA_REPO_OWNER: deepakkt
+      DATA_REPO_NAME: 2025-dmml-data
+      DATA_REPO_PATH: data-repo
+      MODEL_VERSION: v0.1.0
+    steps:
+      - name: Checkout core repo (2025-dmml-core)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout data repo (2025-dmml-data)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}
+          path: ${{ env.DATA_REPO_PATH }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install scikit-learn pandas numpy joblib pyyaml
+
+      - name: Train model using transformed.csv
+        env:
+          GITHUB_SHA: ${{ env.CORE_SHA }}
+        run: |
+          python tools/model-training/train.py \
+            --data-repo "${{ github.workspace }}/${{ env.DATA_REPO_PATH }}" \
+            --out-subdir "models/churn" \
+            --version "${{ env.MODEL_VERSION }}"
+
+      - name: Configure git author for data repo
+        run: |
+          git -C "${{ env.DATA_REPO_PATH }}" config user.name  "github-actions[bot]"
+          git -C "${{ env.DATA_REPO_PATH }}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit & push model artifacts to 2025-dmml-data
+        env:
+          DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          CHANGED=0
+          git -C "${{ env.DATA_REPO_PATH }}" add models/churn || true
+          git -C "${{ env.DATA_REPO_PATH }}" diff --cached --quiet || CHANGED=1
+          if [ "$CHANGED" -eq 1 ]; then
+            git -C "${{ env.DATA_REPO_PATH }}" commit -m "feat(model): add/update churn model artifacts"
+            # Remote is already set by checkout with the provided token; just push
+            git -C "${{ env.DATA_REPO_PATH }}" push
+          else
+            echo "No model changes."
+          fi
+
+
