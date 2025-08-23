@@ -26,5 +26,5 @@ rollmean_email_3,v1,FLOAT,3-pt rolling mean email open rate,SQLite: main.feature
 rollmean_session_3,v1,FLOAT,3-pt rolling mean session hours,SQLite: main.features_churn_v1,Y,Y,
 rollmean_tickets_3,v1,FLOAT,3-pt rolling mean tickets,SQLite: main.features_churn_v1,Y,Y,
 auto_renew_enabled_missing,v1,INT64,Missingness indicator for auto_renew_enabled,SQLite: main.features_churn_v1,Y,Y,1
-monthly_spend,v1,FLOAT,Monthly spend in account currency,SQLite: main.features_churn_v1,Y,Y,0.4834734119928883
+monthly_spend,v1,FLOAT,Monthly spend in account currency,SQLite: main.features_churn_v1,Y,Y,0.4834636442612683
 churned,v1,INT64,Binary label: 1 if churned,SQLite: main.features_churn_v1,Y,N,1
