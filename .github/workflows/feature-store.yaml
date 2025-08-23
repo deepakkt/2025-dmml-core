@@ -31,17 +31,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install deps (pinned)
+           
+      - name: Install deps (pinned & compatible)
         run: |
           python -m pip install --upgrade "pip<25" setuptools wheel
-          pip install "pandas>=2.2,<3" \
-                      "dask[dataframe]>=2024.8.1,<2025.0.0" \
-                      "pyarrow>=15,<19" \
-                      "feast>=0.35,<0.37" \
-                      "redis>=5,<6" \
-                      "python-dateutil>=2.8.2"
-           
+          pip install \
+          "feast[redis]>=0.49,<0.53" \
+          "pandas>=2.2,<3" \
+          "dask[dataframe]>=2024.8.1,<2025.7.0" \
+          "pyarrow>=15,<19" \
+          "redis>=5,<6" \
+          "python-dateutil>=2.8.2"
+            
       - name: Checkout data repo (2025-dmml-data)
         uses: actions/checkout@v4
         with:
