@@ -1,4 +1,4 @@
-name: Orchestrate DM4ML Pipeline (ingest → train)
+name: Orchestrate DM4ML Pipeline
 
 on:
   workflow_dispatch: {}   # manual kick-off
