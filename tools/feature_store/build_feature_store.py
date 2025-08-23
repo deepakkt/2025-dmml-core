@@ -1,35 +1,28 @@
 #!/usr/bin/env python3
 """
-Build & materialize a Feast feature store from a SQLite source.
+Build & materialize a Feast feature store from a SQLite source (soft-fail validation).
 
 - Source of truth: 2025-dmml-data/transformed-data/transformed.sqlite
   table: main.features_churn_v1 (unique key on [customer_id, asof_date])
 
-- Flow:
-  1) Read from SQLite (no parquet dependency in data repo)
-  2) Validate schema & values (guardrails)
-  3) Export an ephemeral file snapshot to feature_repo/_sqlite_export/features_churn_v1.parquet
-     (Feast's local provider expects file-based batch sources for offline)
+Flow:
+  1) Read from SQLite
+  2) Validate & coerce (SOFT by default): log invalid rows to stdout, drop them, continue
+  3) Export an ephemeral parquet snapshot under feature_repo/_sqlite_export/
   4) feast apply + (optional) materialize to Redis
   5) Generate docs/FEATURE_CATALOG.md and docs/feature_catalog.csv
 
-Note:
-This keeps your offline store file-based (per assignment), while allowing you to
-author the transformed dataset in SQLite. The SQLite → file snapshot is ephemeral
-and regenerated each run.
+Use --strict-validation to revert to hard-fail behavior.
 """
 import argparse
-import os
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
-
 import sqlite3
 import pandas as pd
 
 # Feast
-from feast import FeatureStore, FeatureView, FileSource, Entity, Field
+from feast import FeatureStore, FeatureView, FileSource, Entity, Field, FeatureService
 from feast.types import Int64, Float32
-from feast import FeatureService
 
 CATALOG_MD = Path("docs/FEATURE_CATALOG.md")
 CATALOG_CSV = Path("docs/feature_catalog.csv")
@@ -75,96 +68,129 @@ ONLINE_FEATURES = [k for k, v in FEATURE_META.items() if v["online"]]
 LABELS = [k for k, v in FEATURE_META.items() if (v["offline"] and not v["online"])]
 
 # -----------------------------
-# Helpers
+# Load
 # -----------------------------
 def load_from_sqlite(sqlite_path: Path, table: str) -> pd.DataFrame:
     if not sqlite_path.exists():
         raise FileNotFoundError(f"SQLite DB not found: {sqlite_path}")
     with sqlite3.connect(sqlite_path) as con:
-        df = pd.read_sql_query(f"SELECT * FROM {table}", con)
-    return df
+        return pd.read_sql_query(f"SELECT * FROM {table}", con)
 
-def coerce_and_validate(df: pd.DataFrame) -> pd.DataFrame:
-    errs = []
+# -----------------------------
+# Validation (SOFT by default)
+# -----------------------------
+def clean_and_report(df: pd.DataFrame, *, strict: bool = False, max_examples: int = 8) -> pd.DataFrame:
+    """
+    Coerce types, log violations to stdout, and drop offending rows.
+    If strict=True, raise on any violations instead of dropping.
+    """
     required = ["customer_id", "asof_date"] + list(FEATURE_META.keys())
-    miss = [c for c in required if c not in df.columns]
-    if miss:
-        raise SystemExit("VALIDATION FAILED:\n- Missing columns: " + ", ".join(miss))
+    missing_cols = [c for c in required if c not in df.columns]
+    if missing_cols:
+        raise SystemExit("VALIDATION FAILED (schema): missing columns -> " + ", ".join(missing_cols))
 
-    # Coerce types
+    # Coercions
     df["customer_id"] = df["customer_id"].astype(str)
     df["asof_date"] = pd.to_datetime(df["asof_date"], errors="coerce", utc=True)
-    if df["asof_date"].isna().any():
-        errs.append("asof_date not parseable to datetime (UTC)")
 
-    # Int-like columns to pandas nullable Int64
     int_cols = [c for c, m in FEATURE_META.items() if m["dtype"] == Int64]
     for c in int_cols:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce").astype("Int64")
 
-    # Float-like columns
     float_cols = [c for c, m in FEATURE_META.items() if m["dtype"] == Float32]
     for c in float_cols:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce").astype(float)
 
-    # Key nulls
-    if df["customer_id"].isna().any():
-        errs.append("customer_id has nulls")
-    if df["asof_date"].isna().any():
-        errs.append("asof_date has nulls")
+    # Start with all valid; progressively mask out violations
+    valid_mask = pd.Series(True, index=df.index)
+    issues = []
 
-    # Plans in {0,1} and exclusive
+    def flag(name: str, bad_mask: pd.Series, detail: str):
+        nonlocal valid_mask, issues
+        bad_idx = bad_mask[bad_mask].index
+        if len(bad_idx) == 0:
+            return
+        issues.append((name, len(bad_idx), detail, df.loc[bad_idx, ["customer_id", "asof_date"]].head(max_examples)))
+        if strict:
+            pass  # collect and raise later
+        else:
+            valid_mask.loc[bad_idx] = False  # drop these rows
+
+    # Key/timestamp presence
+    flag("customer_id null", df["customer_id"].isna(), "customer_id must be non-null")
+    flag("asof_date null/invalid", df["asof_date"].isna(), "asof_date must be valid datetime")
+
+    # Plans
     for c in ["plan_0", "plan_1", "plan_2"]:
-        if not set(df[c].dropna().unique()).issubset({0, 1}):
-            errs.append(f"{c} must be 0/1")
-    if ((df["plan_0"].fillna(0) + df["plan_1"].fillna(0) + df["plan_2"].fillna(0)) != 1).any():
-        errs.append("plan_0 + plan_1 + plan_2 must equal 1")
+        flag(f"{c} not in {{0,1}}", ~df[c].isin([0, 1]), f"{c} must be 0/1 integer")
+    plan_sum = (df["plan_0"].fillna(0) + df["plan_1"].fillna(0) + df["plan_2"].fillna(0))
+    flag("plan exclusivity", plan_sum != 1, "plan_0 + plan_1 + plan_2 must equal 1")
 
-    # Flag columns in {0,1}
+    # Other 0/1 flags (exclude integer measures that aren't flags)
     flag_cols = [
         c for c, m in FEATURE_META.items()
         if m["dtype"] == Int64 and c not in ["tenure_days", "days_since_last_login", "churned"]
+        and c not in ["plan_0", "plan_1", "plan_2"]
     ]
     for c in flag_cols:
-        if not set(df[c].dropna().unique()).issubset({0, 1}):
-            errs.append(f"{c} must be 0/1")
+        flag(f"{c} not in {{0,1}}", ~df[c].isin([0, 1]), f"{c} must be 0/1 integer")
 
     # Non-negatives
     for c in ["tickets_per_30d", "session_hours", "monthly_spend", "tenure_days", "days_since_last_login"]:
-        if (df[c].dropna() < 0).any():
-            errs.append(f"{c} must be >= 0")
+        flag(f"{c} negative", df[c].dropna() < 0, f"{c} must be >= 0")
 
     # Ranges
-    def between(series, lo, hi, name):
-        bad = series.dropna()[(series < lo) | (series > hi)]
-        if len(bad) > 0:
-            errs.append(f"{name} out of range [{lo},{hi}]")
-
-    between(df["email_open_rate_30d"], 0.0, 1.0, "email_open_rate_30d")
-    between(df["asof_month_sin"], -1.0, 1.0, "asof_month_sin")
-    between(df["asof_month_cos"], -1.0, 1.0, "asof_month_cos")
+    flag("email_open_rate_30d range", ~df["email_open_rate_30d"].between(0.0, 1.0, inclusive="both"),
+         "email_open_rate_30d must be in [0,1]")
+    flag("asof_month_sin range", ~df["asof_month_sin"].between(-1.0, 1.0, inclusive="both"),
+         "asof_month_sin must be in [-1,1]")
+    flag("asof_month_cos range", ~df["asof_month_cos"].between(-1.0, 1.0, inclusive="both"),
+         "asof_month_cos must be in [-1,1]")
 
     # Auto-renew exclusivity
-    if ((df["auto_renew_enabled"].fillna(0) + df["auto_renew_off"].fillna(0)) > 1).any():
-        errs.append("auto_renew_enabled + auto_renew_off must not exceed 1")
+    flag("auto_renew exclusivity",
+         (df["auto_renew_enabled"].fillna(0) + df["auto_renew_off"].fillna(0)) > 1,
+         "auto_renew_enabled + auto_renew_off must not exceed 1")
 
-    # Label domain
-    if "churned" in df.columns and not set(df["churned"].dropna().unique()).issubset({0, 1}):
-        errs.append("churned must be 0/1")
+    # Label domain (offline only)
+    if "churned" in df.columns:
+        flag("churned not in {0,1}", ~df["churned"].isin([0, 1]), "churned must be 0/1")
 
-    if errs:
-        raise SystemExit("VALIDATION FAILED:\n- " + "\n- ".join(errs))
-    return df
+    # Report
+    if issues:
+        print("\n=== DATA QUALITY REPORT (soft validation) ===")
+        total = len(df)
+        for name, count, detail, sample in issues:
+            print(f"- {name}: {count} row(s) -> {detail}")
+            if len(sample) > 0:
+                print(sample.to_string(index=False))
+        dropped = (valid_mask == False).sum()
+        kept = total - dropped
+        print(f"Summary: total={total}, dropped={dropped}, kept={kept}")
+        print("============================================\n")
 
+    # Hard fail if requested
+    if strict and issues:
+        raise SystemExit("VALIDATION FAILED (strict mode). See report above.")
+
+    # Drop offending rows in soft mode
+    df_clean = df[valid_mask].copy()
+
+    if df_clean.empty:
+        raise SystemExit("VALIDATION FAILED: no valid rows remain after dropping invalid records.")
+
+    return df_clean
+
+# -----------------------------
+# Feast plumbing
+# -----------------------------
 def export_ephemeral_snapshot(df: pd.DataFrame, repo_path: Path) -> Path:
     out_dir = repo_path / "_sqlite_export"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "features_churn_v1.parquet"
-    # Write a single snapshot file that Feast can read as a FileSource
-    df.to_parquet(out_path, index=False)
-
+    df.to_parquet(out_path, index=False, engine="pyarrow")
     return out_path
 
 def ensure_repo_yaml(repo_path: Path, redis_uri: str):
@@ -187,7 +213,7 @@ def build_objects(snapshot_path: Path):
 
     file_src = FileSource(
         name="sqlite_snapshot_source",
-        path=snapshot_path.as_posix(),  # <- ephemeral snapshot
+        path=snapshot_path.as_posix(),
         timestamp_field="asof_date",
     )
 
@@ -215,8 +241,7 @@ def build_objects(snapshot_path: Path):
     )
 
     online_fs = FeatureService(name="online_inference_v1", features=[features_v1])
-    train_fs = FeatureService(name="training_service_v1", features=[features_v1, labels_v1])
-
+    train_fs  = FeatureService(name="training_service_v1", features=[features_v1, labels_v1])
     return [customer, file_src, features_v1, labels_v1, online_fs, train_fs]
 
 def generate_catalog(df_sample: pd.DataFrame):
@@ -258,6 +283,7 @@ def main():
     ap.add_argument("--apply", action="store_true", help="feast apply")
     ap.add_argument("--materialize", action="store_true", help="feast materialize_incremental(now)")
     ap.add_argument("--generate-catalog", action="store_true", help="Write docs/FEATURE_CATALOG.md and CSV")
+    ap.add_argument("--strict-validation", action="store_true", help="Fail the run on any validation issue")
     args = ap.parse_args()
 
     data_repo = Path(args.data_repo).resolve()
@@ -267,8 +293,8 @@ def main():
     # 1) Load from SQLite
     df = load_from_sqlite(sqlite_path, args.sqlite_table)
 
-    # 2) Guardrails
-    df = coerce_and_validate(df)
+    # 2) Soft validation (or strict if flag set)
+    df = clean_and_report(df, strict=args.strict_validation, max_examples=8)
 
     # 3) Feast repo config
     ensure_repo_yaml(repo_path, args.redis)
