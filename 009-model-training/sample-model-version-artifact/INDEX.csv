@@ -1,0 +1,2 @@
+version,date,git_sha,pr_auc,roc_auc,f1,artifact_dir
+v0.1.0,2025-08-23,4ab2abe1,0.503380,0.503190,0.667361,v0.1.0__2025-08-23__4ab2abe1

@@ -1,0 +1,116 @@
+{
+  "features": [
+    {
+      "name": "plan_0",
+      "dtype": "int64"
+    },
+    {
+      "name": "plan_1",
+      "dtype": "int64"
+    },
+    {
+      "name": "plan_2",
+      "dtype": "int64"
+    },
+    {
+      "name": "tenure_days",
+      "dtype": "int64"
+    },
+    {
+      "name": "days_since_last_login",
+      "dtype": "int64"
+    },
+    {
+      "name": "last_login_missing",
+      "dtype": "int64"
+    },
+    {
+      "name": "inactive_30d",
+      "dtype": "int64"
+    },
+    {
+      "name": "inactive_90d",
+      "dtype": "int64"
+    },
+    {
+      "name": "new_user_30d",
+      "dtype": "int64"
+    },
+    {
+      "name": "tickets_per_30d",
+      "dtype": "float64"
+    },
+    {
+      "name": "session_hours",
+      "dtype": "float64"
+    },
+    {
+      "name": "email_open_rate_30d",
+      "dtype": "float64"
+    },
+    {
+      "name": "asof_month_sin",
+      "dtype": "float64"
+    },
+    {
+      "name": "asof_month_cos",
+      "dtype": "float64"
+    },
+    {
+      "name": "auto_renew_enabled",
+      "dtype": "int64"
+    },
+    {
+      "name": "auto_renew_off",
+      "dtype": "int64"
+    },
+    {
+      "name": "auto_renew_off_and_inactive_30d",
+      "dtype": "int64"
+    },
+    {
+      "name": "tenure_x_auto_renew_off",
+      "dtype": "float64"
+    },
+    {
+      "name": "inactivity_x_email",
+      "dtype": "float64"
+    },
+    {
+      "name": "tickets_x_recency",
+      "dtype": "float64"
+    },
+    {
+      "name": "delta_email_opens_30d",
+      "dtype": "float64"
+    },
+    {
+      "name": "delta_session_hours",
+      "dtype": "float64"
+    },
+    {
+      "name": "delta_tickets_30d",
+      "dtype": "float64"
+    },
+    {
+      "name": "rollmean_email_3",
+      "dtype": "float64"
+    },
+    {
+      "name": "rollmean_session_3",
+      "dtype": "float64"
+    },
+    {
+      "name": "rollmean_tickets_3",
+      "dtype": "float64"
+    },
+    {
+      "name": "auto_renew_enabled_missing",
+      "dtype": "int64"
+    },
+    {
+      "name": "monthly_spend",
+      "dtype": "float64"
+    }
+  ]
+}
