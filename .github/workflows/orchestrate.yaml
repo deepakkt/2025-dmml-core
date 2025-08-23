@@ -10,6 +10,13 @@ env:
   DATA_REPO_OWNER: ${{ github.repository_owner }}
   DATA_REPO_NAME: 2025-dmml-data
   MAIN_BRANCH: main
+  DATA_REPO: 2025-dmml-data
+  OUT_DIR: transformed-data
+  SPEC_PATH: tools/data_transformation/feature_spec.json
+  SCRIPT_PATH: tools/data_transformation/transform_features.py
+  TABLE_NAME: features_churn_v1
+  PROFILE: tree_baseline
+
 
 jobs:
   # 1) INGEST
@@ -216,13 +223,6 @@ jobs:
     needs: [prepare]
     permissions:
       contents: write
-    env:
-      DATA_REPO: ${{ env.DATA_REPO_NAME }}
-      OUT_DIR: transformed-data
-      SPEC_PATH: tools/data_transformation/feature_spec.json
-      SCRIPT_PATH: tools/data_transformation/transform_features.py
-      TABLE_NAME: features_churn_v1
-      PROFILE: tree_baseline
     steps:
       - name: Checkout core repo
         uses: actions/checkout@v4
