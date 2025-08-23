@@ -164,6 +164,7 @@ def export_ephemeral_snapshot(df: pd.DataFrame, repo_path: Path) -> Path:
     out_path = out_dir / "features_churn_v1.parquet"
     # Write a single snapshot file that Feast can read as a FileSource
     df.to_parquet(out_path, index=False)
+
     return out_path
 
 def ensure_repo_yaml(repo_path: Path, redis_uri: str):

@@ -32,11 +32,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps
+      - name: Install deps (isolated venv + pinned)
         run: |
-          python -m pip install --upgrade pip
-          pip install "feast>=0.33,<0.36" pandas pyarrow redis
-
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade "pip<25" setuptools wheel
+          pip install -r tools/feature_store/requirements.txt
+            
       - name: Checkout data repo (2025-dmml-data)
         uses: actions/checkout@v4
         with:
