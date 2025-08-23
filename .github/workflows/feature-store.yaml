@@ -1,0 +1,71 @@
+name: Feature Store - Feast (Nightly)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  feast-nightly:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping || exit 1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+
+    env:
+      DATA_REPO_NAME: 2025-dmml-data
+      DATA_REPO_OWNER: deepakkt
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout 2025-dmml-core
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install "feast>=0.33,<0.36" pandas pyarrow redis
+
+      - name: Checkout data repo (2025-dmml-data)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DATA_REPO_OWNER }}/${{ env.DATA_REPO_NAME }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+          path: data-repo
+
+      - name: Build/apply/materialize Feast repo, validate data, and generate catalog
+        run: |
+          python tools/feature_store/build_feature_store.py \
+            --data-repo ./data-repo \
+            --repo-path ./feature_repo \
+            --redis "redis://localhost:6379/0" \
+            --apply \
+            --materialize \
+            --generate-catalog
+
+      - name: Commit generated docs if changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          CHANGED=0
+          git add docs/FEATURE_CATALOG.md docs/feature_catalog.csv || true
+          git diff --cached --quiet || CHANGED=1
+          if [ "$CHANGED" -eq 1 ]; then
+            git commit -m "feat(feast): update feature catalog"
+            git push
+          else
+            echo "No catalog changes."
+          fi
