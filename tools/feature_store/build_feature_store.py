@@ -20,12 +20,34 @@ from datetime import datetime, timedelta, timezone
 import sqlite3
 import pandas as pd
 
-# Feast
+#Feast
 from feast import FeatureStore, FeatureView, FileSource, Entity, Field, FeatureService
 from feast.types import Int64, Float32, ValueType
 
 CATALOG_MD = Path("docs/FEATURE_CATALOG.md")
 CATALOG_CSV = Path("docs/feature_catalog.csv")
+
+
+# ---- Feast dtype → string (robust across versions) -------------------------
+def _feast_dtype_to_str(feast_dtype) -> str:
+    """
+    Works with PrimitiveFeastType in newer Feast and constants like Int64/Float32.
+    """
+    # Try ValueType enum name (preferred)
+    try:
+        vt = feast_dtype.to_value_type()      # returns ValueType enum
+        name = getattr(vt, "name", None)
+        if name:
+            return name
+    except Exception:
+        pass
+    # Fallback: compare common primitives
+    if feast_dtype == Int64:
+        return "INT64"
+    if feast_dtype == Float32:
+        return "FLOAT32"
+    # Last resort
+    return str(feast_dtype)
 
 # -----------------------------
 # Feature metadata (authoritative)
