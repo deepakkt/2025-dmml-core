@@ -3,6 +3,9 @@ name: Feature Store - Feast (Nightly)
 on:
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   feast-nightly:
     runs-on: ubuntu-latest
@@ -74,19 +77,40 @@ jobs:
             --apply \
             --materialize \
             --generate-catalog
-            
-      - name: Commit generated docs if changed
+
+      - name: Commit & push generated docs
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          GH_BRANCH: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          CHANGED=0
+          git config --global --add safe.directory "$PWD"
+
+          # Stage docs
           git add docs/FEATURE_CATALOG.md docs/feature_catalog.csv || true
-          git diff --cached --quiet || CHANGED=1
-          if [ "$CHANGED" -eq 1 ]; then
-            git commit -m "feat(feast): update feature catalog"
-            git push
-          else
+
+          # Exit if nothing changed
+          if git diff --cached --quiet; then
             echo "No catalog changes."
+            exit 0
           fi
+
+          git commit -m "feat(feast): update feature catalog"
+
+          # Choose token: prefer GITHUB_TOKEN, fallback to DATA_REPO_TOKEN
+          TOKEN="${GITHUB_TOKEN:-}"
+          if [ -z "$TOKEN" ]; then
+            TOKEN="${DATA_REPO_TOKEN:-}"
+          fi
+          if [ -z "$TOKEN" ]; then
+            echo "No token available to push (GITHUB_TOKEN/DATA_REPO_TOKEN)"; exit 1
+          fi
+
+          # Rewrite origin to use token and push to current branch
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${GH_REPO}.git"
+          git push origin "HEAD:${GH_BRANCH}"
+                            
