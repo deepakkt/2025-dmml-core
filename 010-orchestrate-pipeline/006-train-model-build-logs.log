@@ -1,0 +1,464 @@
+﻿2025-08-23T14:37:47.5623126Z Current runner version: '2.328.0'
+2025-08-23T14:37:47.5649529Z ##[group]Runner Image Provisioner
+2025-08-23T14:37:47.5650527Z Hosted Compute Agent
+2025-08-23T14:37:47.5651081Z Version: 20250821.380
+2025-08-23T14:37:47.5651688Z Commit: 438d12cb4fe092871db9867344e3bc0bc5319035
+2025-08-23T14:37:47.5652440Z Build Date: 2025-08-21T20:49:43Z
+2025-08-23T14:37:47.5653015Z ##[endgroup]
+2025-08-23T14:37:47.5653844Z ##[group]Operating System
+2025-08-23T14:37:47.5654557Z Ubuntu
+2025-08-23T14:37:47.5655010Z 24.04.2
+2025-08-23T14:37:47.5655470Z LTS
+2025-08-23T14:37:47.5655941Z ##[endgroup]
+2025-08-23T14:37:47.5656454Z ##[group]Runner Image
+2025-08-23T14:37:47.5657039Z Image: ubuntu-24.04
+2025-08-23T14:37:47.5657554Z Version: 20250818.1.0
+2025-08-23T14:37:47.5658584Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250818.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-23T14:37:47.5660095Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250818.1
+2025-08-23T14:37:47.5661134Z ##[endgroup]
+2025-08-23T14:37:47.5662254Z ##[group]GITHUB_TOKEN Permissions
+2025-08-23T14:37:47.5664537Z Contents: write
+2025-08-23T14:37:47.5665090Z Metadata: read
+2025-08-23T14:37:47.5665686Z ##[endgroup]
+2025-08-23T14:37:47.5667972Z Secret source: Actions
+2025-08-23T14:37:47.5668738Z Prepare workflow directory
+2025-08-23T14:37:47.6271632Z Prepare all required actions
+2025-08-23T14:37:47.6311607Z Getting action download info
+2025-08-23T14:37:48.0337620Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-08-23T14:37:48.1194959Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2025-08-23T14:37:48.3128927Z Complete job name: train
+2025-08-23T14:37:48.3784809Z ##[group]Run actions/checkout@v4
+2025-08-23T14:37:48.3785718Z with:
+2025-08-23T14:37:48.3786115Z   fetch-depth: 0
+2025-08-23T14:37:48.3786551Z   repository: deepakkt/2025-dmml-core
+2025-08-23T14:37:48.3787320Z   token: ***
+2025-08-23T14:37:48.3787747Z   ssh-strict: true
+2025-08-23T14:37:48.3788153Z   ssh-user: git
+2025-08-23T14:37:48.3788570Z   persist-credentials: true
+2025-08-23T14:37:48.3789018Z   clean: true
+2025-08-23T14:37:48.3789434Z   sparse-checkout-cone-mode: true
+2025-08-23T14:37:48.3789924Z   fetch-tags: false
+2025-08-23T14:37:48.3790325Z   show-progress: true
+2025-08-23T14:37:48.3790741Z   lfs: false
+2025-08-23T14:37:48.3791118Z   submodules: false
+2025-08-23T14:37:48.3791532Z   set-safe-directory: true
+2025-08-23T14:37:48.3792189Z env:
+2025-08-23T14:37:48.3792577Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:48.3793046Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:48.3793700Z   MAIN_BRANCH: main
+2025-08-23T14:37:48.3794124Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:48.3794618Z   OUT_DIR: transformed-data
+2025-08-23T14:37:48.3795167Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:48.3795892Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:48.3796520Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:48.3796995Z   PROFILE: tree_baseline
+2025-08-23T14:37:48.3797484Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:37:48.3798035Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:37:48.3798496Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:37:48.3798906Z ##[endgroup]
+2025-08-23T14:37:48.4907178Z Syncing repository: deepakkt/2025-dmml-core
+2025-08-23T14:37:48.4909159Z ##[group]Getting Git version info
+2025-08-23T14:37:48.4909932Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:37:48.4910934Z [command]/usr/bin/git version
+2025-08-23T14:37:48.4980063Z git version 2.51.0
+2025-08-23T14:37:48.5007183Z ##[endgroup]
+2025-08-23T14:37:48.5024776Z Temporarily overriding HOME='/home/runner/work/_temp/3d76aa63-94fd-4a22-aeb8-97407de75177' before making global git config changes
+2025-08-23T14:37:48.5027149Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:37:48.5039965Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:37:48.5079980Z Deleting the contents of '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:37:48.5083950Z ##[group]Initializing the repository
+2025-08-23T14:37:48.5088340Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:37:48.5170479Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:37:48.5172215Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:37:48.5173455Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:37:48.5174756Z hint:
+2025-08-23T14:37:48.5175700Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:37:48.5176712Z hint:
+2025-08-23T14:37:48.5177654Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:37:48.5179171Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:37:48.5180399Z hint:
+2025-08-23T14:37:48.5181066Z hint: 	git branch -m <name>
+2025-08-23T14:37:48.5181799Z hint:
+2025-08-23T14:37:48.5182764Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:37:48.5184688Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/.git/
+2025-08-23T14:37:48.5189379Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:37:48.5231046Z ##[endgroup]
+2025-08-23T14:37:48.5232257Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:37:48.5236961Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:37:48.5268602Z ##[endgroup]
+2025-08-23T14:37:48.5270235Z ##[group]Setting up auth
+2025-08-23T14:37:48.5277271Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:37:48.5315064Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:37:48.5648294Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:37:48.5683802Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:37:48.5914894Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:37:48.5953363Z ##[endgroup]
+2025-08-23T14:37:48.5954559Z ##[group]Fetching the repository
+2025-08-23T14:37:48.5962847Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2025-08-23T14:37:49.2455621Z From https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:37:49.2456443Z  * [new branch]      main       -> origin/main
+2025-08-23T14:37:49.2494892Z [command]/usr/bin/git branch --list --remote origin/main
+2025-08-23T14:37:49.2519662Z   origin/main
+2025-08-23T14:37:49.2530328Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+2025-08-23T14:37:49.2552381Z 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:37:49.2558697Z ##[endgroup]
+2025-08-23T14:37:49.2559793Z ##[group]Determining the checkout info
+2025-08-23T14:37:49.2561007Z ##[endgroup]
+2025-08-23T14:37:49.2564192Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:37:49.2607995Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:37:49.2635385Z ##[group]Checking out the ref
+2025-08-23T14:37:49.2639548Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:37:49.2864192Z Switched to a new branch 'main'
+2025-08-23T14:37:49.2865340Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:37:49.2873249Z ##[endgroup]
+2025-08-23T14:37:49.2913415Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:37:49.2938372Z 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:37:49.3201160Z ##[group]Run actions/checkout@v4
+2025-08-23T14:37:49.3201735Z with:
+2025-08-23T14:37:49.3202137Z   repository: deepakkt/2025-dmml-data
+2025-08-23T14:37:49.3202653Z   path: data-repo
+2025-08-23T14:37:49.3203904Z   token: ***
+2025-08-23T14:37:49.3204398Z   fetch-depth: 0
+2025-08-23T14:37:49.3204794Z   ssh-strict: true
+2025-08-23T14:37:49.3205192Z   ssh-user: git
+2025-08-23T14:37:49.3205604Z   persist-credentials: true
+2025-08-23T14:37:49.3206053Z   clean: true
+2025-08-23T14:37:49.3206466Z   sparse-checkout-cone-mode: true
+2025-08-23T14:37:49.3206960Z   fetch-tags: false
+2025-08-23T14:37:49.3207401Z   show-progress: true
+2025-08-23T14:37:49.3207819Z   lfs: false
+2025-08-23T14:37:49.3208183Z   submodules: false
+2025-08-23T14:37:49.3208598Z   set-safe-directory: true
+2025-08-23T14:37:49.3209020Z env:
+2025-08-23T14:37:49.3209389Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:49.3209847Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:49.3210335Z   MAIN_BRANCH: main
+2025-08-23T14:37:49.3210810Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:49.3211256Z   OUT_DIR: transformed-data
+2025-08-23T14:37:49.3211799Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:49.3212505Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:49.3213156Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:49.3213745Z   PROFILE: tree_baseline
+2025-08-23T14:37:49.3214241Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:37:49.3214802Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:37:49.3215242Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:37:49.3215663Z ##[endgroup]
+2025-08-23T14:37:49.4163064Z Syncing repository: deepakkt/2025-dmml-data
+2025-08-23T14:37:49.4169846Z ##[group]Getting Git version info
+2025-08-23T14:37:49.4170682Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core/data-repo'
+2025-08-23T14:37:49.4212150Z [command]/usr/bin/git version
+2025-08-23T14:37:49.4255203Z git version 2.51.0
+2025-08-23T14:37:49.4282680Z ##[endgroup]
+2025-08-23T14:37:49.4299147Z Temporarily overriding HOME='/home/runner/work/_temp/1a2352bf-62bb-4ef0-bae2-80bffb3ea670' before making global git config changes
+2025-08-23T14:37:49.4301541Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:37:49.4314746Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo
+2025-08-23T14:37:49.4349611Z ##[group]Initializing the repository
+2025-08-23T14:37:49.4355293Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo
+2025-08-23T14:37:49.4394292Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:37:49.4395907Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:37:49.4396888Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:37:49.4397556Z hint:
+2025-08-23T14:37:49.4398175Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:37:49.4398781Z hint:
+2025-08-23T14:37:49.4399339Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:37:49.4400319Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:37:49.4401468Z hint:
+2025-08-23T14:37:49.4401873Z hint: 	git branch -m <name>
+2025-08-23T14:37:49.4402317Z hint:
+2025-08-23T14:37:49.4402897Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:37:49.4404342Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo/.git/
+2025-08-23T14:37:49.4406864Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-data
+2025-08-23T14:37:49.4439275Z ##[endgroup]
+2025-08-23T14:37:49.4440037Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:37:49.4444142Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:37:49.4474712Z ##[endgroup]
+2025-08-23T14:37:49.4475792Z ##[group]Setting up auth
+2025-08-23T14:37:49.4481839Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:37:49.4514862Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:37:49.4749466Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:37:49.4783181Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:37:49.5019414Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:37:49.5059558Z ##[endgroup]
+2025-08-23T14:37:49.5061043Z ##[group]Determining the default branch
+2025-08-23T14:37:49.5063436Z Retrieving the default branch name
+2025-08-23T14:37:49.8765658Z Default branch 'main'
+2025-08-23T14:37:49.8767856Z ##[endgroup]
+2025-08-23T14:37:49.8769504Z ##[group]Fetching the repository
+2025-08-23T14:37:49.8779610Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2025-08-23T14:37:51.6065926Z From https://github.com/deepakkt/2025-dmml-data
+2025-08-23T14:37:51.6066671Z  * [new branch]      main       -> origin/main
+2025-08-23T14:37:51.6099712Z ##[endgroup]
+2025-08-23T14:37:51.6100563Z ##[group]Determining the checkout info
+2025-08-23T14:37:51.6101556Z ##[endgroup]
+2025-08-23T14:37:51.6107452Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:37:51.6152849Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:37:51.6189356Z ##[group]Checking out the ref
+2025-08-23T14:37:51.6190869Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:37:51.7911770Z Switched to a new branch 'main'
+2025-08-23T14:37:51.7912828Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:37:51.7942042Z ##[endgroup]
+2025-08-23T14:37:51.7992906Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:37:51.8021548Z bd9a271a0396a95effd32b804fbf8b5c2dfe6d9f
+2025-08-23T14:37:51.8284420Z ##[group]Run actions/setup-python@v5
+2025-08-23T14:37:51.8284764Z with:
+2025-08-23T14:37:51.8284984Z   python-version: 3.11
+2025-08-23T14:37:51.8285286Z   check-latest: false
+2025-08-23T14:37:51.8285617Z   token: ***
+2025-08-23T14:37:51.8285875Z   update-environment: true
+2025-08-23T14:37:51.8286173Z   allow-prereleases: false
+2025-08-23T14:37:51.8286388Z   freethreaded: false
+2025-08-23T14:37:51.8286578Z env:
+2025-08-23T14:37:51.8286842Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:51.8287091Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:51.8287327Z   MAIN_BRANCH: main
+2025-08-23T14:37:51.8287542Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:51.8287832Z   OUT_DIR: transformed-data
+2025-08-23T14:37:51.8288122Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:51.8288608Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:51.8288964Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:51.8289229Z   PROFILE: tree_baseline
+2025-08-23T14:37:51.8289566Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:37:51.8289834Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:37:51.8290107Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:37:51.8290345Z ##[endgroup]
+2025-08-23T14:37:52.0029736Z ##[group]Installed versions
+2025-08-23T14:37:52.0142638Z Successfully set up CPython (3.11.13)
+2025-08-23T14:37:52.0143692Z ##[endgroup]
+2025-08-23T14:37:52.0267188Z ##[group]Run python -m pip install --upgrade pip
+2025-08-23T14:37:52.0267666Z [36;1mpython -m pip install --upgrade pip[0m
+2025-08-23T14:37:52.0268054Z [36;1mpip install scikit-learn pandas numpy joblib pyyaml[0m
+2025-08-23T14:37:52.0651896Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:37:52.0652492Z env:
+2025-08-23T14:37:52.0652694Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:52.0652936Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:52.0653163Z   MAIN_BRANCH: main
+2025-08-23T14:37:52.0653362Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:52.0653763Z   OUT_DIR: transformed-data
+2025-08-23T14:37:52.0654041Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:52.0654410Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:52.0654738Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:52.0654976Z   PROFILE: tree_baseline
+2025-08-23T14:37:52.0655212Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:37:52.0655549Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:37:52.0655762Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:37:52.0656039Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:52.0656503Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:37:52.0656901Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:52.0657253Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:52.0657606Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:52.0657959Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:37:52.0658277Z ##[endgroup]
+2025-08-23T14:37:54.1728367Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (25.2)
+2025-08-23T14:37:54.8679872Z Collecting scikit-learn
+2025-08-23T14:37:54.9029152Z   Downloading scikit_learn-1.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (11 kB)
+2025-08-23T14:37:55.0216921Z Collecting pandas
+2025-08-23T14:37:55.0253039Z   Downloading pandas-2.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (91 kB)
+2025-08-23T14:37:55.2352517Z Collecting numpy
+2025-08-23T14:37:55.2386222Z   Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2025-08-23T14:37:55.2706627Z Collecting joblib
+2025-08-23T14:37:55.2740375Z   Downloading joblib-1.5.1-py3-none-any.whl.metadata (5.6 kB)
+2025-08-23T14:37:55.3094631Z Collecting pyyaml
+2025-08-23T14:37:55.3145019Z   Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+2025-08-23T14:37:55.4608926Z Collecting scipy>=1.8.0 (from scikit-learn)
+2025-08-23T14:37:55.4643504Z   Downloading scipy-1.16.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (61 kB)
+2025-08-23T14:37:55.4938339Z Collecting threadpoolctl>=3.1.0 (from scikit-learn)
+2025-08-23T14:37:55.4972522Z   Downloading threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+2025-08-23T14:37:55.5211870Z Collecting python-dateutil>=2.8.2 (from pandas)
+2025-08-23T14:37:55.5244064Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+2025-08-23T14:37:55.5625007Z Collecting pytz>=2020.1 (from pandas)
+2025-08-23T14:37:55.5666151Z   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+2025-08-23T14:37:55.5828566Z Collecting tzdata>=2022.7 (from pandas)
+2025-08-23T14:37:55.5858615Z   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+2025-08-23T14:37:55.6044232Z Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas)
+2025-08-23T14:37:55.6074333Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-08-23T14:37:55.6269234Z Downloading scikit_learn-1.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (9.7 MB)
+2025-08-23T14:37:55.7134527Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.7/9.7 MB 118.7 MB/s  0:00:00
+2025-08-23T14:37:55.7189637Z Downloading pandas-2.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.4 MB)
+2025-08-23T14:37:55.7810164Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.4/12.4 MB 213.0 MB/s  0:00:00
+2025-08-23T14:37:55.7842458Z Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+2025-08-23T14:37:55.8544303Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 247.6 MB/s  0:00:00
+2025-08-23T14:37:55.8575644Z Downloading joblib-1.5.1-py3-none-any.whl (307 kB)
+2025-08-23T14:37:55.8650936Z Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (762 kB)
+2025-08-23T14:37:55.8722447Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 763.0/763.0 kB 108.0 MB/s  0:00:00
+2025-08-23T14:37:55.8755670Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+2025-08-23T14:37:55.8892469Z Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+2025-08-23T14:37:55.8965964Z Downloading scipy-1.16.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (35.4 MB)
+2025-08-23T14:37:56.0603351Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.4/35.4 MB 221.2 MB/s  0:00:00
+2025-08-23T14:37:56.0634984Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+2025-08-23T14:37:56.0688531Z Downloading threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+2025-08-23T14:37:56.0745175Z Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+2025-08-23T14:37:56.2445150Z Installing collected packages: pytz, tzdata, threadpoolctl, six, pyyaml, numpy, joblib, scipy, python-dateutil, scikit-learn, pandas
+2025-08-23T14:38:08.9848962Z 
+2025-08-23T14:38:08.9863255Z Successfully installed joblib-1.5.1 numpy-2.3.2 pandas-2.3.2 python-dateutil-2.9.0.post0 pytz-2025.2 pyyaml-6.0.2 scikit-learn-1.7.1 scipy-1.16.1 six-1.17.0 threadpoolctl-3.6.0 tzdata-2025.2
+2025-08-23T14:38:09.1502208Z ##[group]Run python tools/model-training/train.py \
+2025-08-23T14:38:09.1502611Z [36;1mpython tools/model-training/train.py \[0m
+2025-08-23T14:38:09.1503039Z [36;1m  --data-repo "/home/runner/work/2025-dmml-core/2025-dmml-core/data-repo" \[0m
+2025-08-23T14:38:09.1503433Z [36;1m  --out-subdir "models/churn" \[0m
+2025-08-23T14:38:09.1503873Z [36;1m  --version "v0.1.0"[0m
+2025-08-23T14:38:09.1546254Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:38:09.1546490Z env:
+2025-08-23T14:38:09.1546671Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:38:09.1546904Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:38:09.1547148Z   MAIN_BRANCH: main
+2025-08-23T14:38:09.1547330Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:38:09.1547539Z   OUT_DIR: transformed-data
+2025-08-23T14:38:09.1547800Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:38:09.1548161Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:38:09.1548488Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:38:09.1548753Z   PROFILE: tree_baseline
+2025-08-23T14:38:09.1548997Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:38:09.1549271Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:38:09.1549475Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:38:09.1549738Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:09.1550133Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:38:09.1550519Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:09.1550860Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:09.1551225Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:09.1551576Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:38:09.1551905Z   GITHUB_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:38:09.1552174Z ##[endgroup]
+2025-08-23T14:38:10.7886722Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:10.7888323Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:10.7889043Z   warnings.warn(
+2025-08-23T14:38:10.8109207Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:10.8134979Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:10.8136330Z   warnings.warn(
+2025-08-23T14:38:10.8564304Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:10.8566408Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:10.8567366Z   warnings.warn(
+2025-08-23T14:38:10.8881561Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:10.8883859Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:10.8884838Z   warnings.warn(
+2025-08-23T14:38:10.9497121Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:10.9499828Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:10.9500781Z   warnings.warn(
+2025-08-23T14:38:11.1065985Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:11.1067836Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:11.1068708Z   warnings.warn(
+2025-08-23T14:38:11.1364856Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:11.1367106Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:11.1368098Z   warnings.warn(
+2025-08-23T14:38:12.8431835Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:12.8433048Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:12.8433809Z   warnings.warn(
+2025-08-23T14:38:12.9886899Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:12.9890294Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:12.9892312Z   warnings.warn(
+2025-08-23T14:38:16.1804928Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:16.1807023Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:16.1807963Z   warnings.warn(
+2025-08-23T14:38:16.3675978Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:16.3678548Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:16.3679498Z   warnings.warn(
+2025-08-23T14:38:21.1083486Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:21.1085051Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:21.1085661Z   warnings.warn(
+2025-08-23T14:38:21.3582888Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:21.3584884Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:21.3585579Z   warnings.warn(
+2025-08-23T14:38:21.6446426Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:21.6448633Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:21.6449716Z   warnings.warn(
+2025-08-23T14:38:21.7176852Z /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/sklearn/impute/_base.py:637: UserWarning: Skipping features without any observed values: ['delta_email_opens_30d' 'delta_session_hours' 'delta_tickets_30d'
+2025-08-23T14:38:21.7181963Z  'rollmean_email_3' 'rollmean_session_3' 'rollmean_tickets_3']. At least one non-missing value is needed for imputation with strategy='median'.
+2025-08-23T14:38:21.7186147Z   warnings.warn(
+2025-08-23T14:38:21.7524938Z Selected model: logreg
+2025-08-23T14:38:21.7528646Z Threshold: 0.4381532861712871
+2025-08-23T14:38:21.7529864Z Test metrics: {'roc_auc': 0.4998676614338647, 'pr_auc': 0.49832132766028114, 'accuracy': 0.49646341463414634, 'precision': 0.49646341463414634, 'recall': 1.0, 'f1': 0.6635156059000896}
+2025-08-23T14:38:21.7565679Z Artifacts written to: /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo/models/churn/v0.1.0__2025-08-23__2ec50239
+2025-08-23T14:38:21.9544961Z ##[group]Run git -C "data-repo" config user.name  "github-actions[bot]"
+2025-08-23T14:38:21.9545470Z [36;1mgit -C "data-repo" config user.name  "github-actions[bot]"[0m
+2025-08-23T14:38:21.9545969Z [36;1mgit -C "data-repo" config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+2025-08-23T14:38:21.9586933Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:38:21.9587161Z env:
+2025-08-23T14:38:21.9587341Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:38:21.9587573Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:38:21.9587799Z   MAIN_BRANCH: main
+2025-08-23T14:38:21.9587986Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:38:21.9588191Z   OUT_DIR: transformed-data
+2025-08-23T14:38:21.9588458Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:38:21.9588821Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:38:21.9589128Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:38:21.9589354Z   PROFILE: tree_baseline
+2025-08-23T14:38:21.9589634Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:38:21.9589903Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:38:21.9590117Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:38:21.9590376Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9590784Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:38:21.9591352Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9591702Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9592045Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9592391Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:38:21.9592687Z ##[endgroup]
+2025-08-23T14:38:21.9713994Z ##[group]Run set -euo pipefail
+2025-08-23T14:38:21.9714327Z [36;1mset -euo pipefail[0m
+2025-08-23T14:38:21.9714556Z [36;1mCHANGED=0[0m
+2025-08-23T14:38:21.9714788Z [36;1mgit -C "data-repo" add models/churn || true[0m
+2025-08-23T14:38:21.9715148Z [36;1mgit -C "data-repo" diff --cached --quiet || CHANGED=1[0m
+2025-08-23T14:38:21.9715476Z [36;1mif [ "$CHANGED" -eq 1 ]; then[0m
+2025-08-23T14:38:21.9715838Z [36;1m  git -C "data-repo" commit -m "feat(model): add/update churn model artifacts"[0m
+2025-08-23T14:38:21.9716204Z [36;1m  git -C "data-repo" push[0m
+2025-08-23T14:38:21.9716450Z [36;1melse[0m
+2025-08-23T14:38:21.9716636Z [36;1m  echo "No model changes."[0m
+2025-08-23T14:38:21.9716852Z [36;1mfi[0m
+2025-08-23T14:38:21.9757235Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:38:21.9757462Z env:
+2025-08-23T14:38:21.9757650Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:38:21.9757886Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:38:21.9758102Z   MAIN_BRANCH: main
+2025-08-23T14:38:21.9758338Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:38:21.9758539Z   OUT_DIR: transformed-data
+2025-08-23T14:38:21.9758797Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:38:21.9759164Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:38:21.9759475Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:38:21.9759696Z   PROFILE: tree_baseline
+2025-08-23T14:38:21.9759932Z   CORE_SHA: 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:38:21.9760195Z   DATA_REPO_PATH: data-repo
+2025-08-23T14:38:21.9760399Z   MODEL_VERSION: v0.1.0
+2025-08-23T14:38:21.9760672Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9761076Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:38:21.9761473Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9761824Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9762180Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:38:21.9762523Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:38:21.9762820Z ##[endgroup]
+2025-08-23T14:38:22.1452063Z [main fa10b5a] feat(model): add/update churn model artifacts
+2025-08-23T14:38:22.1452566Z  11 files changed, 144 insertions(+)
+2025-08-23T14:38:22.1452947Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/TRAINING_SOURCE.txt
+2025-08-23T14:38:22.1453807Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/data_hash.txt
+2025-08-23T14:38:22.1454587Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/feature_signature.json
+2025-08-23T14:38:22.1455417Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/metrics.json
+2025-08-23T14:38:22.1455914Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/model.pkl
+2025-08-23T14:38:22.1456333Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/params.yaml
+2025-08-23T14:38:22.1456816Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/performance/accuracy.txt
+2025-08-23T14:38:22.1457295Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/performance/f1.txt
+2025-08-23T14:38:22.1457769Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/performance/precision.txt
+2025-08-23T14:38:22.1458257Z  create mode 100644 models/churn/v0.1.0__2025-08-23__2ec50239/performance/recall.txt
+2025-08-23T14:38:22.8755102Z To https://github.com/deepakkt/2025-dmml-data
+2025-08-23T14:38:22.8755635Z    bd9a271..fa10b5a  main -> main
+2025-08-23T14:38:22.8845885Z Post job cleanup.
+2025-08-23T14:38:23.0540014Z Post job cleanup.
+2025-08-23T14:38:23.1521610Z [command]/usr/bin/git version
+2025-08-23T14:38:23.1560617Z git version 2.51.0
+2025-08-23T14:38:23.1606743Z Temporarily overriding HOME='/home/runner/work/_temp/ad3e220c-8450-461d-a5d3-823590f7e57c' before making global git config changes
+2025-08-23T14:38:23.1608030Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:38:23.1613789Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo
+2025-08-23T14:38:23.1661159Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:38:23.1697342Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:38:23.1936574Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:38:23.1960579Z http.https://github.com/.extraheader
+2025-08-23T14:38:23.1974478Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:38:23.2008120Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:38:23.2363765Z Post job cleanup.
+2025-08-23T14:38:23.3359206Z [command]/usr/bin/git version
+2025-08-23T14:38:23.3414462Z git version 2.51.0
+2025-08-23T14:38:23.3480898Z Temporarily overriding HOME='/home/runner/work/_temp/c42b5684-113e-4ade-a66b-212fd2326fe0' before making global git config changes
+2025-08-23T14:38:23.3482140Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:38:23.3490562Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:38:23.3541569Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:38:23.3581533Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:38:23.3843748Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:38:23.3872809Z http.https://github.com/.extraheader
+2025-08-23T14:38:23.3888002Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:38:23.3926745Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:38:23.4325311Z Cleaning up orphan processes

@@ -1,0 +1,283 @@
+﻿2025-08-23T14:35:24.9336656Z Current runner version: '2.328.0'
+2025-08-23T14:35:24.9361027Z ##[group]Runner Image Provisioner
+2025-08-23T14:35:24.9361899Z Hosted Compute Agent
+2025-08-23T14:35:24.9362458Z Version: 20250821.380
+2025-08-23T14:35:24.9363192Z Commit: 438d12cb4fe092871db9867344e3bc0bc5319035
+2025-08-23T14:35:24.9363868Z Build Date: 2025-08-21T20:49:43Z
+2025-08-23T14:35:24.9364465Z ##[endgroup]
+2025-08-23T14:35:24.9365094Z ##[group]Operating System
+2025-08-23T14:35:24.9365625Z Ubuntu
+2025-08-23T14:35:24.9366083Z 24.04.2
+2025-08-23T14:35:24.9366702Z LTS
+2025-08-23T14:35:24.9367132Z ##[endgroup]
+2025-08-23T14:35:24.9367652Z ##[group]Runner Image
+2025-08-23T14:35:24.9368266Z Image: ubuntu-24.04
+2025-08-23T14:35:24.9368746Z Version: 20250818.1.0
+2025-08-23T14:35:24.9370054Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250818.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-23T14:35:24.9371674Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250818.1
+2025-08-23T14:35:24.9372701Z ##[endgroup]
+2025-08-23T14:35:24.9373709Z ##[group]GITHUB_TOKEN Permissions
+2025-08-23T14:35:24.9375474Z Contents: write
+2025-08-23T14:35:24.9376162Z Metadata: read
+2025-08-23T14:35:24.9376650Z ##[endgroup]
+2025-08-23T14:35:24.9378645Z Secret source: Actions
+2025-08-23T14:35:24.9379704Z Prepare workflow directory
+2025-08-23T14:35:24.9953766Z Prepare all required actions
+2025-08-23T14:35:24.9990541Z Getting action download info
+2025-08-23T14:35:25.3750280Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-08-23T14:35:25.4996995Z Complete job name: ingest
+2025-08-23T14:35:25.5715254Z ##[group]Run actions/checkout@v4
+2025-08-23T14:35:25.5716074Z with:
+2025-08-23T14:35:25.5716488Z   repository: deepakkt/2025-dmml-core
+2025-08-23T14:35:25.5717202Z   token: ***
+2025-08-23T14:35:25.5717581Z   ssh-strict: true
+2025-08-23T14:35:25.5717975Z   ssh-user: git
+2025-08-23T14:35:25.5718372Z   persist-credentials: true
+2025-08-23T14:35:25.5718818Z   clean: true
+2025-08-23T14:35:25.5719243Z   sparse-checkout-cone-mode: true
+2025-08-23T14:35:25.5719900Z   fetch-depth: 1
+2025-08-23T14:35:25.5720296Z   fetch-tags: false
+2025-08-23T14:35:25.5720699Z   show-progress: true
+2025-08-23T14:35:25.5721094Z   lfs: false
+2025-08-23T14:35:25.5721459Z   submodules: false
+2025-08-23T14:35:25.5721862Z   set-safe-directory: true
+2025-08-23T14:35:25.5722515Z env:
+2025-08-23T14:35:25.5722895Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:25.5723355Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:25.5723804Z   MAIN_BRANCH: main
+2025-08-23T14:35:25.5724202Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:25.5724682Z   OUT_DIR: transformed-data
+2025-08-23T14:35:25.5725210Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:25.5725911Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:25.5726529Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:25.5726979Z   PROFILE: tree_baseline
+2025-08-23T14:35:25.5727412Z   SCHEMA_ENGAGEMENT: 85d441d0
+2025-08-23T14:35:25.5727875Z   SCHEMA_SATISFACTION: da85de20
+2025-08-23T14:35:25.5728370Z   MOCKAROO_KEY: ***
+2025-08-23T14:35:25.5728756Z   COUNT: 1000
+2025-08-23T14:35:25.5729121Z ##[endgroup]
+2025-08-23T14:35:25.6790040Z Syncing repository: deepakkt/2025-dmml-core
+2025-08-23T14:35:25.6791752Z ##[group]Getting Git version info
+2025-08-23T14:35:25.6792498Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:35:25.6793609Z [command]/usr/bin/git version
+2025-08-23T14:35:25.6830670Z git version 2.51.0
+2025-08-23T14:35:25.6856593Z ##[endgroup]
+2025-08-23T14:35:25.6870918Z Temporarily overriding HOME='/home/runner/work/_temp/768837cf-7a5d-475e-857d-bae8a77f3cac' before making global git config changes
+2025-08-23T14:35:25.6873039Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:35:25.6883083Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:35:25.6915305Z Deleting the contents of '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:35:25.6918787Z ##[group]Initializing the repository
+2025-08-23T14:35:25.6923029Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:35:25.6979337Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:35:25.6981303Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:35:25.6982807Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:35:25.6983571Z hint:
+2025-08-23T14:35:25.6984076Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:35:25.6984660Z hint:
+2025-08-23T14:35:25.6985211Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:35:25.6986109Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:35:25.6986979Z hint:
+2025-08-23T14:35:25.6987585Z hint: 	git branch -m <name>
+2025-08-23T14:35:25.6988153Z hint:
+2025-08-23T14:35:25.6988742Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:35:25.6989972Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/.git/
+2025-08-23T14:35:25.6993118Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:35:25.7024729Z ##[endgroup]
+2025-08-23T14:35:25.7025452Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:35:25.7028690Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:35:25.7056219Z ##[endgroup]
+2025-08-23T14:35:25.7057124Z ##[group]Setting up auth
+2025-08-23T14:35:25.7063135Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:35:25.7092576Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:35:25.7346860Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:35:25.7374923Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:35:25.7592258Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:35:25.7626837Z ##[endgroup]
+2025-08-23T14:35:25.7627765Z ##[group]Fetching the repository
+2025-08-23T14:35:25.7635645Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2ec502390f832756844845b8b748c1bfa6ab1b7f:refs/remotes/origin/main
+2025-08-23T14:35:26.3861827Z From https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:35:26.3863285Z  * [new ref]         2ec502390f832756844845b8b748c1bfa6ab1b7f -> origin/main
+2025-08-23T14:35:26.3891425Z ##[endgroup]
+2025-08-23T14:35:26.3892112Z ##[group]Determining the checkout info
+2025-08-23T14:35:26.3893799Z ##[endgroup]
+2025-08-23T14:35:26.3899094Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:35:26.3937879Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:35:26.3966517Z ##[group]Checking out the ref
+2025-08-23T14:35:26.3970796Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:35:26.4228421Z Switched to a new branch 'main'
+2025-08-23T14:35:26.4231819Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:35:26.4238139Z ##[endgroup]
+2025-08-23T14:35:26.4273268Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:35:26.4295597Z 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:35:26.4529044Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:26.4529895Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:26.4530369Z [36;1mmissing=0[0m
+2025-08-23T14:35:26.4530897Z [36;1mfor v in SCHEMA_ENGAGEMENT SCHEMA_SATISFACTION; do[0m
+2025-08-23T14:35:26.4531709Z [36;1m  if [ -z "${!v:-}" ]; then[0m
+2025-08-23T14:35:26.4532351Z [36;1m    echo "::error::Repository variable '$v' is not set"; missing=1[0m
+2025-08-23T14:35:26.4532980Z [36;1m  fi[0m
+2025-08-23T14:35:26.4533344Z [36;1mdone[0m
+2025-08-23T14:35:26.4533760Z [36;1mif [ -z "${MOCKAROO_KEY:-}" ]; then[0m
+2025-08-23T14:35:26.4534399Z [36;1m  echo "::error::Secret 'MOCKAROO_KEY' is not set"; missing=1[0m
+2025-08-23T14:35:26.4534998Z [36;1mfi[0m
+2025-08-23T14:35:26.4535982Z [36;1mif [ -z "***" ]; then[0m
+2025-08-23T14:35:26.4536594Z [36;1m  echo "::error::Secret 'DATA_REPO_TOKEN' is not set"; missing=1[0m
+2025-08-23T14:35:26.4537204Z [36;1mfi[0m
+2025-08-23T14:35:26.4537655Z [36;1mif [ "$missing" -ne 0 ]; then exit 1; fi[0m
+2025-08-23T14:35:26.4605285Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:26.4605774Z env:
+2025-08-23T14:35:26.4606138Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:26.4606593Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:26.4607096Z   MAIN_BRANCH: main
+2025-08-23T14:35:26.4607515Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:26.4607958Z   OUT_DIR: transformed-data
+2025-08-23T14:35:26.4608492Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:26.4609187Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:26.4609985Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:26.4610449Z   PROFILE: tree_baseline
+2025-08-23T14:35:26.4610873Z   SCHEMA_ENGAGEMENT: 85d441d0
+2025-08-23T14:35:26.4611336Z   SCHEMA_SATISFACTION: da85de20
+2025-08-23T14:35:26.4611847Z   MOCKAROO_KEY: ***
+2025-08-23T14:35:26.4612237Z   COUNT: 1000
+2025-08-23T14:35:26.4612597Z ##[endgroup]
+2025-08-23T14:35:26.4728761Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:26.4729325Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:26.4731222Z [36;1mgit clone --depth 1 "***github.com/deepakkt/2025-dmml-data.git" data-repo[0m
+2025-08-23T14:35:26.4731931Z [36;1mcd data-repo[0m
+2025-08-23T14:35:26.4732514Z [36;1mgit checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"[0m
+2025-08-23T14:35:26.4768657Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:26.4769102Z env:
+2025-08-23T14:35:26.4769463Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:26.4770172Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:26.4770637Z   MAIN_BRANCH: main
+2025-08-23T14:35:26.4771031Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:26.4771479Z   OUT_DIR: transformed-data
+2025-08-23T14:35:26.4772009Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:26.4772705Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:26.4773324Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:26.4773813Z   PROFILE: tree_baseline
+2025-08-23T14:35:26.4774241Z   SCHEMA_ENGAGEMENT: 85d441d0
+2025-08-23T14:35:26.4774698Z   SCHEMA_SATISFACTION: da85de20
+2025-08-23T14:35:26.4775205Z   MOCKAROO_KEY: ***
+2025-08-23T14:35:26.4775581Z   COUNT: 1000
+2025-08-23T14:35:26.4776005Z ##[endgroup]
+2025-08-23T14:35:26.4843595Z Cloning into 'data-repo'...
+2025-08-23T14:35:28.7411393Z Already on 'main'
+2025-08-23T14:35:28.7413748Z Your branch is up to date with 'origin/main'.
+2025-08-23T14:35:28.7451392Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:28.7451785Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:28.7452057Z [36;1mpython3 - << 'PY'[0m
+2025-08-23T14:35:28.7452310Z [36;1mimport os, json, time[0m
+2025-08-23T14:35:28.7452608Z [36;1mfrom datetime import datetime, timezone[0m
+2025-08-23T14:35:28.7452943Z [36;1mfrom pathlib import Path[0m
+2025-08-23T14:35:28.7453252Z [36;1mfrom urllib.request import urlopen, Request[0m
+2025-08-23T14:35:28.7453610Z [36;1mfrom urllib.error import URLError, HTTPError[0m
+2025-08-23T14:35:28.7453922Z [36;1m[0m
+2025-08-23T14:35:28.7454200Z [36;1mSCHEMA_ENGAGEMENT = os.environ["SCHEMA_ENGAGEMENT"][0m
+2025-08-23T14:35:28.7454616Z [36;1mSCHEMA_SATISFACTION = os.environ["SCHEMA_SATISFACTION"][0m
+2025-08-23T14:35:28.7455018Z [36;1mMOCKAROO_KEY = os.environ["MOCKAROO_KEY"][0m
+2025-08-23T14:35:28.7455353Z [36;1mCOUNT = os.environ.get("COUNT","1000")[0m
+2025-08-23T14:35:28.7455856Z [36;1mbase_dir = Path("data-repo")[0m
+2025-08-23T14:35:28.7456158Z [36;1m[0m
+2025-08-23T14:35:28.7456458Z [36;1mdef http_get_json(url: str, tries: int = 5, backoff: float = 1.5):[0m
+2025-08-23T14:35:28.7456831Z [36;1m  last_err = None[0m
+2025-08-23T14:35:28.7457086Z [36;1m  for i in range(1, tries+1):[0m
+2025-08-23T14:35:28.7457351Z [36;1m    try:[0m
+2025-08-23T14:35:28.7457722Z [36;1m      req = Request(url, headers={"User-Agent":"gh-actions-mockaroo-ingest/1.0"})[0m
+2025-08-23T14:35:28.7458184Z [36;1m      with urlopen(req, timeout=60) as resp:[0m
+2025-08-23T14:35:28.7458493Z [36;1m        data = resp.read()[0m
+2025-08-23T14:35:28.7458787Z [36;1m      return json.loads(data)[0m
+2025-08-23T14:35:28.7459153Z [36;1m    except (HTTPError, URLError, json.JSONDecodeError) as e:[0m
+2025-08-23T14:35:28.7459801Z [36;1m      last_err = e[0m
+2025-08-23T14:35:28.7460165Z [36;1m      if i < tries:[0m
+2025-08-23T14:35:28.7460435Z [36;1m        time.sleep(backoff ** i)[0m
+2025-08-23T14:35:28.7460733Z [36;1m      else:[0m
+2025-08-23T14:35:28.7460992Z [36;1m        raise[0m
+2025-08-23T14:35:28.7461234Z [36;1m  raise last_err[0m
+2025-08-23T14:35:28.7461466Z [36;1m[0m
+2025-08-23T14:35:28.7461773Z [36;1mdef save_dataset(kind: str, schema_id: str, key: str, ts_dir: Path):[0m
+2025-08-23T14:35:28.7462335Z [36;1m  url = f"https://api.mockaroo.com/api/{schema_id}?count={COUNT}&key={key}"[0m
+2025-08-23T14:35:28.7463298Z [36;1m  payload = http_get_json(url)[0m
+2025-08-23T14:35:28.7463611Z [36;1m  out_file = ts_dir / kind / "data.json"[0m
+2025-08-23T14:35:28.7463978Z [36;1m  out_file.parent.mkdir(parents=True, exist_ok=True)[0m
+2025-08-23T14:35:28.7464357Z [36;1m  with out_file.open("w", encoding="utf-8") as f:[0m
+2025-08-23T14:35:28.7464733Z [36;1m    json.dump(payload, f, ensure_ascii=False, indent=2)[0m
+2025-08-23T14:35:28.7465258Z [36;1m  print(f"Wrote {kind} -> {out_file} (records: {len(payload) if isinstance(payload, list) else 'n/a'})")[0m
+2025-08-23T14:35:28.7465723Z [36;1m[0m
+2025-08-23T14:35:28.7466023Z [36;1mts = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H:%M:%S")[0m
+2025-08-23T14:35:28.7466402Z [36;1mts_dir = base_dir / "raw-data" / ts[0m
+2025-08-23T14:35:28.7466682Z [36;1m[0m
+2025-08-23T14:35:28.7466992Z [36;1msave_dataset("engagement", SCHEMA_ENGAGEMENT, MOCKAROO_KEY, ts_dir)[0m
+2025-08-23T14:35:28.7467487Z [36;1msave_dataset("satisfaction", SCHEMA_SATISFACTION, MOCKAROO_KEY, ts_dir)[0m
+2025-08-23T14:35:28.7467872Z [36;1m[0m
+2025-08-23T14:35:28.7468152Z [36;1mwith open(base_dir / ".ingest_ts", "w", encoding="utf-8") as f:[0m
+2025-08-23T14:35:28.7468500Z [36;1m  f.write(ts)[0m
+2025-08-23T14:35:28.7468731Z [36;1mPY[0m
+2025-08-23T14:35:28.7510029Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:28.7510323Z env:
+2025-08-23T14:35:28.7510541Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:28.7510809Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:28.7511067Z   MAIN_BRANCH: main
+2025-08-23T14:35:28.7511285Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:28.7511558Z   OUT_DIR: transformed-data
+2025-08-23T14:35:28.7512064Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:28.7512487Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:28.7512848Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:28.7513114Z   PROFILE: tree_baseline
+2025-08-23T14:35:28.7513364Z   SCHEMA_ENGAGEMENT: 85d441d0
+2025-08-23T14:35:28.7513622Z   SCHEMA_SATISFACTION: da85de20
+2025-08-23T14:35:28.7514119Z   MOCKAROO_KEY: ***
+2025-08-23T14:35:28.7514349Z   COUNT: 1000
+2025-08-23T14:35:28.7514567Z ##[endgroup]
+2025-08-23T14:35:31.9091683Z Wrote engagement -> data-repo/raw-data/2025-08-23-14:35:28/engagement/data.json (records: 1000)
+2025-08-23T14:35:31.9095474Z Wrote satisfaction -> data-repo/raw-data/2025-08-23-14:35:28/satisfaction/data.json (records: 1000)
+2025-08-23T14:35:31.9223376Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:31.9223745Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:31.9224053Z [36;1mTS="$(cat data-repo/.ingest_ts)"[0m
+2025-08-23T14:35:31.9224616Z [36;1mcd data-repo[0m
+2025-08-23T14:35:31.9224938Z [36;1mgit config --global --add safe.directory "$PWD"[0m
+2025-08-23T14:35:31.9225327Z [36;1mgit config user.name "${GITHUB_ACTOR}"[0m
+2025-08-23T14:35:31.9225759Z [36;1mgit config user.email "${GITHUB_ACTOR}@users.noreply.github.com"[0m
+2025-08-23T14:35:31.9226153Z [36;1mgit add -A[0m
+2025-08-23T14:35:31.9226420Z [36;1mif git diff --cached --quiet; then[0m
+2025-08-23T14:35:31.9226738Z [36;1m  echo "No changes to commit."[0m
+2025-08-23T14:35:31.9227021Z [36;1m  exit 0[0m
+2025-08-23T14:35:31.9227259Z [36;1mfi[0m
+2025-08-23T14:35:31.9227520Z [36;1mgit commit -m "Ingest raw data: ${TS}"[0m
+2025-08-23T14:35:31.9227859Z [36;1mgit push origin "HEAD:${MAIN_BRANCH}"[0m
+2025-08-23T14:35:31.9271076Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:31.9271394Z env:
+2025-08-23T14:35:31.9271622Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:31.9271897Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:31.9272181Z   MAIN_BRANCH: main
+2025-08-23T14:35:31.9272413Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:31.9272677Z   OUT_DIR: transformed-data
+2025-08-23T14:35:31.9272994Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:31.9273438Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:31.9273809Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:31.9274093Z   PROFILE: tree_baseline
+2025-08-23T14:35:31.9274369Z   SCHEMA_ENGAGEMENT: 85d441d0
+2025-08-23T14:35:31.9274648Z   SCHEMA_SATISFACTION: da85de20
+2025-08-23T14:35:31.9275105Z   MOCKAROO_KEY: ***
+2025-08-23T14:35:31.9275370Z   COUNT: 1000
+2025-08-23T14:35:31.9275586Z ##[endgroup]
+2025-08-23T14:35:32.1076737Z [main 853026f] Ingest raw data: 2025-08-23-14:35:28
+2025-08-23T14:35:32.1077666Z  3 files changed, 27969 insertions(+), 1 deletion(-)
+2025-08-23T14:35:32.1078729Z  create mode 100644 raw-data/2025-08-23-14:35:28/engagement/data.json
+2025-08-23T14:35:32.1080092Z  create mode 100644 raw-data/2025-08-23-14:35:28/satisfaction/data.json
+2025-08-23T14:35:33.0722998Z To https://github.com/deepakkt/2025-dmml-data.git
+2025-08-23T14:35:33.0723869Z    8e99117..853026f  HEAD -> main
+2025-08-23T14:35:33.0902728Z Post job cleanup.
+2025-08-23T14:35:33.1839413Z [command]/usr/bin/git version
+2025-08-23T14:35:33.1875983Z git version 2.51.0
+2025-08-23T14:35:33.1915511Z Copying '/home/runner/.gitconfig' to '/home/runner/work/_temp/a0d759af-0740-4f07-83c3-d1d3fc139425/.gitconfig'
+2025-08-23T14:35:33.1924771Z Temporarily overriding HOME='/home/runner/work/_temp/a0d759af-0740-4f07-83c3-d1d3fc139425' before making global git config changes
+2025-08-23T14:35:33.1926064Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:35:33.1931641Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:35:33.1972032Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:35:33.2004858Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:35:33.2226093Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:35:33.2245960Z http.https://github.com/.extraheader
+2025-08-23T14:35:33.2258645Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:35:33.2288213Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:35:33.2605462Z Cleaning up orphan processes

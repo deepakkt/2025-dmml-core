@@ -1,0 +1,753 @@
+﻿2025-08-23T14:36:49.8693109Z Current runner version: '2.328.0'
+2025-08-23T14:36:49.8715369Z ##[group]Runner Image Provisioner
+2025-08-23T14:36:49.8716312Z Hosted Compute Agent
+2025-08-23T14:36:49.8716840Z Version: 20250818.377
+2025-08-23T14:36:49.8717410Z Commit: 3c593e9f75fe0b87e893bca80d6e12ba089c61fc
+2025-08-23T14:36:49.8718149Z Build Date: 2025-08-18T14:52:18Z
+2025-08-23T14:36:49.8719055Z ##[endgroup]
+2025-08-23T14:36:49.8719604Z ##[group]Operating System
+2025-08-23T14:36:49.8720227Z Ubuntu
+2025-08-23T14:36:49.8720694Z 24.04.2
+2025-08-23T14:36:49.8721116Z LTS
+2025-08-23T14:36:49.8721622Z ##[endgroup]
+2025-08-23T14:36:49.8722120Z ##[group]Runner Image
+2025-08-23T14:36:49.8722651Z Image: ubuntu-24.04
+2025-08-23T14:36:49.8723229Z Version: 20250818.1.0
+2025-08-23T14:36:49.8724210Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250818.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-23T14:36:49.8725743Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250818.1
+2025-08-23T14:36:49.8726698Z ##[endgroup]
+2025-08-23T14:36:49.8727734Z ##[group]GITHUB_TOKEN Permissions
+2025-08-23T14:36:49.8729661Z Contents: write
+2025-08-23T14:36:49.8730226Z Metadata: read
+2025-08-23T14:36:49.8730841Z ##[endgroup]
+2025-08-23T14:36:49.8732758Z Secret source: Actions
+2025-08-23T14:36:49.8733482Z Prepare workflow directory
+2025-08-23T14:36:49.9455669Z Prepare all required actions
+2025-08-23T14:36:49.9512780Z Getting action download info
+2025-08-23T14:36:50.1863083Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-08-23T14:36:50.2600180Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2025-08-23T14:36:50.4815009Z Complete job name: feature_store
+2025-08-23T14:36:50.5246487Z ##[group]Checking docker version
+2025-08-23T14:36:50.5259725Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2025-08-23T14:36:50.5864252Z '1.48'
+2025-08-23T14:36:50.5876171Z Docker daemon API version: '1.48'
+2025-08-23T14:36:50.5876922Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2025-08-23T14:36:50.6028621Z '1.48'
+2025-08-23T14:36:50.6041993Z Docker client API version: '1.48'
+2025-08-23T14:36:50.6046830Z ##[endgroup]
+2025-08-23T14:36:50.6049986Z ##[group]Clean up resources from previous jobs
+2025-08-23T14:36:50.6055938Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=6d243c"
+2025-08-23T14:36:50.6192559Z ##[command]/usr/bin/docker network prune --force --filter "label=6d243c"
+2025-08-23T14:36:50.6318250Z ##[endgroup]
+2025-08-23T14:36:50.6318966Z ##[group]Create local container network
+2025-08-23T14:36:50.6328758Z ##[command]/usr/bin/docker network create --label 6d243c github_network_c55148aa0cb3421685f6bbf78783032b
+2025-08-23T14:36:50.6811020Z 19d11a7dd63076bbd63260b86639d4a1a55217aaa275b0d6d4eabd4b9b594e1f
+2025-08-23T14:36:50.6829922Z ##[endgroup]
+2025-08-23T14:36:50.6853420Z ##[group]Starting redis service container
+2025-08-23T14:36:50.6872723Z ##[command]/usr/bin/docker pull redis:7
+2025-08-23T14:36:50.9284545Z 7: Pulling from library/redis
+2025-08-23T14:36:50.9797308Z b1badc6e5066: Pulling fs layer
+2025-08-23T14:36:50.9798190Z 746f3da5d8fb: Pulling fs layer
+2025-08-23T14:36:50.9799026Z 1d58eaac926a: Pulling fs layer
+2025-08-23T14:36:50.9799592Z 5c06f884d8fa: Pulling fs layer
+2025-08-23T14:36:50.9800478Z 5ce544915f10: Pulling fs layer
+2025-08-23T14:36:50.9801259Z b547341e3d62: Pulling fs layer
+2025-08-23T14:36:50.9801929Z 4f4fb700ef54: Pulling fs layer
+2025-08-23T14:36:50.9802499Z b5cf1c58df65: Pulling fs layer
+2025-08-23T14:36:50.9803042Z b547341e3d62: Waiting
+2025-08-23T14:36:50.9803466Z 4f4fb700ef54: Waiting
+2025-08-23T14:36:50.9803895Z b5cf1c58df65: Waiting
+2025-08-23T14:36:50.9804306Z 5ce544915f10: Waiting
+2025-08-23T14:36:50.9804754Z 5c06f884d8fa: Waiting
+2025-08-23T14:36:51.0682433Z 746f3da5d8fb: Verifying Checksum
+2025-08-23T14:36:51.0683671Z 746f3da5d8fb: Download complete
+2025-08-23T14:36:51.0741272Z 1d58eaac926a: Verifying Checksum
+2025-08-23T14:36:51.0742308Z 1d58eaac926a: Download complete
+2025-08-23T14:36:51.1815109Z 5ce544915f10: Verifying Checksum
+2025-08-23T14:36:51.1816445Z 5ce544915f10: Download complete
+2025-08-23T14:36:51.1898959Z 5c06f884d8fa: Verifying Checksum
+2025-08-23T14:36:51.1899961Z 5c06f884d8fa: Download complete
+2025-08-23T14:36:51.2392426Z b547341e3d62: Verifying Checksum
+2025-08-23T14:36:51.2394297Z b547341e3d62: Download complete
+2025-08-23T14:36:51.2552929Z 4f4fb700ef54: Verifying Checksum
+2025-08-23T14:36:51.2553911Z 4f4fb700ef54: Download complete
+2025-08-23T14:36:51.3533904Z b5cf1c58df65: Verifying Checksum
+2025-08-23T14:36:51.3535243Z b5cf1c58df65: Download complete
+2025-08-23T14:36:51.4188661Z b1badc6e5066: Verifying Checksum
+2025-08-23T14:36:52.4446279Z b1badc6e5066: Download complete
+2025-08-23T14:36:52.4446980Z b1badc6e5066: Pull complete
+2025-08-23T14:36:52.5326646Z 746f3da5d8fb: Pull complete
+2025-08-23T14:36:52.5479495Z 1d58eaac926a: Pull complete
+2025-08-23T14:36:52.6026590Z 5c06f884d8fa: Pull complete
+2025-08-23T14:36:52.8177518Z 5ce544915f10: Pull complete
+2025-08-23T14:36:52.8284725Z b547341e3d62: Pull complete
+2025-08-23T14:36:52.8386778Z 4f4fb700ef54: Pull complete
+2025-08-23T14:36:52.8493270Z b5cf1c58df65: Pull complete
+2025-08-23T14:36:52.8545685Z Digest: sha256:4421962706d7a901cbd435282515704040203d67c653160e3a46a27b79c40e19
+2025-08-23T14:36:52.8558027Z Status: Downloaded newer image for redis:7
+2025-08-23T14:36:52.8568228Z docker.io/library/redis:7
+2025-08-23T14:36:52.8604054Z ##[command]/usr/bin/docker create --name a8f4f66dfb404b44939338378cc37fc0_redis7_50dc6d --label 6d243c --network github_network_c55148aa0cb3421685f6bbf78783032b --network-alias redis -p 6379:6379 --health-cmd "redis-cli ping || exit 1" --health-interval 5s --health-timeout 3s --health-retries 20 -e GITHUB_ACTIONS=true -e CI=true redis:7
+2025-08-23T14:36:52.8857455Z e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:52.8879383Z ##[command]/usr/bin/docker start e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:53.2007139Z e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:53.2027829Z ##[command]/usr/bin/docker ps --all --filter id=e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2025-08-23T14:36:53.2147766Z e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6 Up Less than a second (health: starting)
+2025-08-23T14:36:53.2168067Z ##[command]/usr/bin/docker port e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:53.2283392Z 6379/tcp -> 0.0.0.0:6379
+2025-08-23T14:36:53.2283894Z 6379/tcp -> [::]:6379
+2025-08-23T14:36:53.2327267Z ##[endgroup]
+2025-08-23T14:36:53.2335831Z ##[group]Waiting for all services to be ready
+2025-08-23T14:36:53.2348892Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:53.2464547Z starting
+2025-08-23T14:36:53.2484477Z redis service is starting, waiting 2 seconds before checking again.
+2025-08-23T14:36:55.2483709Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:55.2599890Z starting
+2025-08-23T14:36:55.2613455Z redis service is starting, waiting 4 seconds before checking again.
+2025-08-23T14:36:59.2859552Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:36:59.2984642Z healthy
+2025-08-23T14:36:59.3004651Z redis service is healthy.
+2025-08-23T14:36:59.3005353Z ##[endgroup]
+2025-08-23T14:36:59.3230974Z ##[group]Run actions/checkout@v4
+2025-08-23T14:36:59.3231527Z with:
+2025-08-23T14:36:59.3231730Z   repository: deepakkt/2025-dmml-core
+2025-08-23T14:36:59.3232114Z   token: ***
+2025-08-23T14:36:59.3232302Z   ssh-strict: true
+2025-08-23T14:36:59.3232697Z   ssh-user: git
+2025-08-23T14:36:59.3232889Z   persist-credentials: true
+2025-08-23T14:36:59.3233104Z   clean: true
+2025-08-23T14:36:59.3233291Z   sparse-checkout-cone-mode: true
+2025-08-23T14:36:59.3233527Z   fetch-depth: 1
+2025-08-23T14:36:59.3233712Z   fetch-tags: false
+2025-08-23T14:36:59.3233895Z   show-progress: true
+2025-08-23T14:36:59.3234091Z   lfs: false
+2025-08-23T14:36:59.3234254Z   submodules: false
+2025-08-23T14:36:59.3234440Z   set-safe-directory: true
+2025-08-23T14:36:59.3234858Z env:
+2025-08-23T14:36:59.3235032Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:59.3235250Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:59.3235474Z   MAIN_BRANCH: main
+2025-08-23T14:36:59.3235661Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:59.3235891Z   OUT_DIR: transformed-data
+2025-08-23T14:36:59.3236145Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:59.3236520Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:59.3236848Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:59.3237075Z   PROFILE: tree_baseline
+2025-08-23T14:36:59.3237275Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:36:59.3237459Z ##[endgroup]
+2025-08-23T14:36:59.4275677Z Syncing repository: deepakkt/2025-dmml-core
+2025-08-23T14:36:59.4277190Z ##[group]Getting Git version info
+2025-08-23T14:36:59.4277610Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:36:59.4278177Z [command]/usr/bin/git version
+2025-08-23T14:36:59.4318608Z git version 2.51.0
+2025-08-23T14:36:59.4344259Z ##[endgroup]
+2025-08-23T14:36:59.4358001Z Temporarily overriding HOME='/home/runner/work/_temp/268540bb-6482-43fc-914a-c327bb217ce0' before making global git config changes
+2025-08-23T14:36:59.4359435Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:36:59.4370774Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:36:59.4403018Z Deleting the contents of '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:36:59.4406436Z ##[group]Initializing the repository
+2025-08-23T14:36:59.4410490Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:36:59.4473078Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:36:59.4474070Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:36:59.4474987Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:36:59.4475470Z hint:
+2025-08-23T14:36:59.4475745Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:36:59.4476056Z hint:
+2025-08-23T14:36:59.4476415Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:36:59.4477310Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:36:59.4478015Z hint:
+2025-08-23T14:36:59.4478614Z hint: 	git branch -m <name>
+2025-08-23T14:36:59.4479066Z hint:
+2025-08-23T14:36:59.4479638Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:36:59.4480762Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/.git/
+2025-08-23T14:36:59.4488002Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:36:59.4519784Z ##[endgroup]
+2025-08-23T14:36:59.4520399Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:36:59.4524783Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:36:59.4552412Z ##[endgroup]
+2025-08-23T14:36:59.4553020Z ##[group]Setting up auth
+2025-08-23T14:36:59.4560043Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:36:59.4590132Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:36:59.4854992Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:36:59.4883800Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:36:59.5101744Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:36:59.5136048Z ##[endgroup]
+2025-08-23T14:36:59.5136735Z ##[group]Fetching the repository
+2025-08-23T14:36:59.5145399Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2ec502390f832756844845b8b748c1bfa6ab1b7f:refs/remotes/origin/main
+2025-08-23T14:36:59.8605202Z From https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:36:59.8606571Z  * [new ref]         2ec502390f832756844845b8b748c1bfa6ab1b7f -> origin/main
+2025-08-23T14:36:59.8637701Z ##[endgroup]
+2025-08-23T14:36:59.8638284Z ##[group]Determining the checkout info
+2025-08-23T14:36:59.8640046Z ##[endgroup]
+2025-08-23T14:36:59.8646065Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:36:59.8684622Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:36:59.8713435Z ##[group]Checking out the ref
+2025-08-23T14:36:59.8717664Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:36:59.8978046Z Switched to a new branch 'main'
+2025-08-23T14:36:59.8980832Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:36:59.8986649Z ##[endgroup]
+2025-08-23T14:36:59.9023648Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:36:59.9046042Z 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:36:59.9329284Z ##[group]Run actions/setup-python@v5
+2025-08-23T14:36:59.9329562Z with:
+2025-08-23T14:36:59.9329743Z   python-version: 3.11
+2025-08-23T14:36:59.9329948Z   check-latest: false
+2025-08-23T14:36:59.9330258Z   token: ***
+2025-08-23T14:36:59.9330445Z   update-environment: true
+2025-08-23T14:36:59.9330682Z   allow-prereleases: false
+2025-08-23T14:36:59.9330878Z   freethreaded: false
+2025-08-23T14:36:59.9331066Z env:
+2025-08-23T14:36:59.9331221Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:59.9331434Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:59.9331650Z   MAIN_BRANCH: main
+2025-08-23T14:36:59.9331820Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:59.9332020Z   OUT_DIR: transformed-data
+2025-08-23T14:36:59.9332269Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:59.9332621Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:59.9332928Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:59.9333138Z   PROFILE: tree_baseline
+2025-08-23T14:36:59.9333373Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:36:59.9333556Z ##[endgroup]
+2025-08-23T14:37:00.0994216Z ##[group]Installed versions
+2025-08-23T14:37:00.1123954Z Successfully set up CPython (3.11.13)
+2025-08-23T14:37:00.1124741Z ##[endgroup]
+2025-08-23T14:37:00.1230371Z ##[group]Run python -m pip install --upgrade "pip<25" setuptools wheel
+2025-08-23T14:37:00.1230921Z [36;1mpython -m pip install --upgrade "pip<25" setuptools wheel[0m
+2025-08-23T14:37:00.1231253Z [36;1mpip install \[0m
+2025-08-23T14:37:00.1231458Z [36;1m  "pandas==2.2.2" \[0m
+2025-08-23T14:37:00.1231689Z [36;1m  "dask[dataframe]==2024.8.1" \[0m
+2025-08-23T14:37:00.1231926Z [36;1m  "pyarrow==17.0.0" \[0m
+2025-08-23T14:37:00.1232135Z [36;1m  "feast==0.52.0" \[0m
+2025-08-23T14:37:00.1232336Z [36;1m  "redis==5.0.7" \[0m
+2025-08-23T14:37:00.1232543Z [36;1m  "python-dateutil>=2.8.2"[0m
+2025-08-23T14:37:00.1526091Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:37:00.1526330Z env:
+2025-08-23T14:37:00.1526513Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:00.1526731Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:00.1526953Z   MAIN_BRANCH: main
+2025-08-23T14:37:00.1527139Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:00.1527344Z   OUT_DIR: transformed-data
+2025-08-23T14:37:00.1527654Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:00.1528211Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:00.1528672Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:00.1528889Z   PROFILE: tree_baseline
+2025-08-23T14:37:00.1529094Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:37:00.1529353Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:00.1529757Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:37:00.1530150Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:00.1530496Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:00.1530857Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:00.1531230Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:37:00.1531536Z ##[endgroup]
+2025-08-23T14:37:03.1156687Z Collecting pip<25
+2025-08-23T14:37:03.1524872Z   Downloading pip-24.3.1-py3-none-any.whl.metadata (3.7 kB)
+2025-08-23T14:37:03.1564385Z Requirement already satisfied: setuptools in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (65.5.0)
+2025-08-23T14:37:03.2953357Z Collecting setuptools
+2025-08-23T14:37:03.2991370Z   Downloading setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
+2025-08-23T14:37:03.3278123Z Collecting wheel
+2025-08-23T14:37:03.3310367Z   Downloading wheel-0.45.1-py3-none-any.whl.metadata (2.3 kB)
+2025-08-23T14:37:03.3395282Z Downloading pip-24.3.1-py3-none-any.whl (1.8 MB)
+2025-08-23T14:37:03.3849854Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 61.0 MB/s  0:00:00
+2025-08-23T14:37:03.3885322Z Downloading setuptools-80.9.0-py3-none-any.whl (1.2 MB)
+2025-08-23T14:37:03.4042324Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 80.3 MB/s  0:00:00
+2025-08-23T14:37:03.4075970Z Downloading wheel-0.45.1-py3-none-any.whl (72 kB)
+2025-08-23T14:37:03.4460554Z Installing collected packages: wheel, setuptools, pip
+2025-08-23T14:37:03.4894830Z   Attempting uninstall: setuptools
+2025-08-23T14:37:03.4910462Z     Found existing installation: setuptools 65.5.0
+2025-08-23T14:37:03.5371122Z     Uninstalling setuptools-65.5.0:
+2025-08-23T14:37:03.5512648Z       Successfully uninstalled setuptools-65.5.0
+2025-08-23T14:37:04.2465524Z   Attempting uninstall: pip
+2025-08-23T14:37:04.2480335Z     Found existing installation: pip 25.2
+2025-08-23T14:37:04.3385551Z     Uninstalling pip-25.2:
+2025-08-23T14:37:04.3439736Z       Successfully uninstalled pip-25.2
+2025-08-23T14:37:05.1690527Z 
+2025-08-23T14:37:05.1699444Z Successfully installed pip-24.3.1 setuptools-80.9.0 wheel-0.45.1
+2025-08-23T14:37:05.2325277Z 
+2025-08-23T14:37:05.2325690Z [notice] A new release of pip is available: 24.3.1 -> 25.2
+2025-08-23T14:37:05.2326371Z [notice] To update, run: pip install --upgrade pip
+2025-08-23T14:37:06.2048906Z Collecting pandas==2.2.2
+2025-08-23T14:37:06.2387313Z   Downloading pandas-2.2.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+2025-08-23T14:37:06.3225292Z Collecting dask==2024.8.1 (from dask[dataframe]==2024.8.1)
+2025-08-23T14:37:06.3275587Z   Downloading dask-2024.8.1-py3-none-any.whl.metadata (3.8 kB)
+2025-08-23T14:37:06.4202324Z Collecting pyarrow==17.0.0
+2025-08-23T14:37:06.4240072Z   Downloading pyarrow-17.0.0-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.3 kB)
+2025-08-23T14:37:06.4762193Z Collecting feast==0.52.0
+2025-08-23T14:37:06.4805121Z   Downloading feast-0.52.0-py2.py3-none-any.whl.metadata (36 kB)
+2025-08-23T14:37:06.5726373Z Collecting redis==5.0.7
+2025-08-23T14:37:06.5796325Z   Downloading redis-5.0.7-py3-none-any.whl.metadata (9.3 kB)
+2025-08-23T14:37:06.5985243Z Collecting python-dateutil>=2.8.2
+2025-08-23T14:37:06.6020213Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+2025-08-23T14:37:06.7921944Z Collecting numpy>=1.23.2 (from pandas==2.2.2)
+2025-08-23T14:37:06.7959446Z   Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2025-08-23T14:37:06.8516929Z Collecting pytz>=2020.1 (from pandas==2.2.2)
+2025-08-23T14:37:06.8552869Z   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+2025-08-23T14:37:06.8730327Z Collecting tzdata>=2022.7 (from pandas==2.2.2)
+2025-08-23T14:37:06.8764394Z   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+2025-08-23T14:37:06.8996497Z Collecting click>=8.1 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:06.9033423Z   Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:06.9376560Z Collecting cloudpickle>=3.0.0 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:06.9410946Z   Downloading cloudpickle-3.1.1-py3-none-any.whl.metadata (7.1 kB)
+2025-08-23T14:37:06.9715912Z Collecting fsspec>=2021.09.0 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:06.9750595Z   Downloading fsspec-2025.7.0-py3-none-any.whl.metadata (12 kB)
+2025-08-23T14:37:07.0209701Z Collecting packaging>=20.0 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:07.0248061Z   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+2025-08-23T14:37:07.0400825Z Collecting partd>=1.4.0 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:07.0434888Z   Downloading partd-1.4.2-py3-none-any.whl.metadata (4.6 kB)
+2025-08-23T14:37:07.0826401Z Collecting pyyaml>=5.3.1 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:07.0865525Z   Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+2025-08-23T14:37:07.1005496Z Collecting toolz>=0.10.0 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:07.1039552Z   Downloading toolz-1.0.0-py3-none-any.whl.metadata (5.1 kB)
+2025-08-23T14:37:07.1547878Z Collecting importlib-metadata>=4.13.0 (from dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:07.1584139Z   Downloading importlib_metadata-8.7.0-py3-none-any.whl.metadata (4.8 kB)
+2025-08-23T14:37:07.1949397Z Collecting colorama<1,>=0.3.9 (from feast==0.52.0)
+2025-08-23T14:37:07.1986884Z   Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+2025-08-23T14:37:07.2160933Z Collecting dill~=0.3.0 (from feast==0.52.0)
+2025-08-23T14:37:07.2195086Z   Downloading dill-0.3.9-py3-none-any.whl.metadata (10 kB)
+2025-08-23T14:37:07.3987810Z Collecting protobuf>=4.24.0 (from feast==0.52.0)
+2025-08-23T14:37:07.4025937Z   Downloading protobuf-6.32.0-cp39-abi3-manylinux2014_x86_64.whl.metadata (593 bytes)
+2025-08-23T14:37:07.4242328Z Collecting Jinja2<4,>=2 (from feast==0.52.0)
+2025-08-23T14:37:07.4277177Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+2025-08-23T14:37:07.4598887Z Collecting jsonschema (from feast==0.52.0)
+2025-08-23T14:37:07.4635210Z   Downloading jsonschema-4.25.1-py3-none-any.whl.metadata (7.6 kB)
+2025-08-23T14:37:07.5114403Z Collecting mmh3 (from feast==0.52.0)
+2025-08-23T14:37:07.5165839Z   Downloading mmh3-5.2.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (14 kB)
+2025-08-23T14:37:07.6661111Z Collecting pydantic==2.10.6 (from feast==0.52.0)
+2025-08-23T14:37:07.6698010Z   Downloading pydantic-2.10.6-py3-none-any.whl.metadata (30 kB)
+2025-08-23T14:37:07.6973632Z Collecting pygments<3,>=2.12.0 (from feast==0.52.0)
+2025-08-23T14:37:07.7007637Z   Downloading pygments-2.19.2-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:07.7346814Z Collecting requests (from feast==0.52.0)
+2025-08-23T14:37:07.7384586Z   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+2025-08-23T14:37:08.0782476Z Collecting SQLAlchemy>1 (from SQLAlchemy[mypy]>1->feast==0.52.0)
+2025-08-23T14:37:08.0822970Z   Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+2025-08-23T14:37:08.1039694Z Collecting tabulate<1,>=0.8.0 (from feast==0.52.0)
+2025-08-23T14:37:08.1075135Z   Downloading tabulate-0.9.0-py3-none-any.whl.metadata (34 kB)
+2025-08-23T14:37:08.1309552Z Collecting tenacity<9,>=7 (from feast==0.52.0)
+2025-08-23T14:37:08.1357184Z   Downloading tenacity-8.5.0-py3-none-any.whl.metadata (1.2 kB)
+2025-08-23T14:37:08.1484732Z Collecting toml<1,>=0.10.0 (from feast==0.52.0)
+2025-08-23T14:37:08.1519911Z   Downloading toml-0.10.2-py2.py3-none-any.whl.metadata (7.1 kB)
+2025-08-23T14:37:08.2123537Z Collecting tqdm<5,>=4 (from feast==0.52.0)
+2025-08-23T14:37:08.2158902Z   Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+2025-08-23T14:37:08.2480339Z Collecting typeguard>=4.0.0 (from feast==0.52.0)
+2025-08-23T14:37:08.2517347Z   Downloading typeguard-4.4.4-py3-none-any.whl.metadata (3.3 kB)
+2025-08-23T14:37:08.3259200Z Collecting fastapi>=0.68.0 (from feast==0.52.0)
+2025-08-23T14:37:08.3297395Z   Downloading fastapi-0.116.1-py3-none-any.whl.metadata (28 kB)
+2025-08-23T14:37:08.3674386Z Collecting uvicorn==0.34.0 (from uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:08.3711772Z   Downloading uvicorn-0.34.0-py3-none-any.whl.metadata (6.5 kB)
+2025-08-23T14:37:08.3843451Z Collecting uvicorn-worker (from feast==0.52.0)
+2025-08-23T14:37:08.3891955Z   Downloading uvicorn_worker-0.3.0-py3-none-any.whl.metadata (2.6 kB)
+2025-08-23T14:37:08.4094318Z Collecting gunicorn (from feast==0.52.0)
+2025-08-23T14:37:08.4127038Z   Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
+2025-08-23T14:37:08.4423010Z Collecting prometheus_client (from feast==0.52.0)
+2025-08-23T14:37:08.4459858Z   Downloading prometheus_client-0.22.1-py3-none-any.whl.metadata (1.9 kB)
+2025-08-23T14:37:08.5274510Z Collecting psutil (from feast==0.52.0)
+2025-08-23T14:37:08.5313959Z   Downloading psutil-7.0.0-cp36-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (22 kB)
+2025-08-23T14:37:08.6198795Z Collecting bigtree>=0.19.2 (from feast==0.52.0)
+2025-08-23T14:37:08.6244627Z   Downloading bigtree-0.29.2-py3-none-any.whl.metadata (9.6 kB)
+2025-08-23T14:37:08.6458729Z Collecting pyjwt (from feast==0.52.0)
+2025-08-23T14:37:08.6498060Z   Downloading PyJWT-2.10.1-py3-none-any.whl.metadata (4.0 kB)
+2025-08-23T14:37:08.6882160Z Collecting dask-expr<1.2,>=1.1 (from dask[dataframe]==2024.8.1)
+2025-08-23T14:37:08.6922114Z   Downloading dask_expr-1.1.21-py3-none-any.whl.metadata (2.6 kB)
+2025-08-23T14:37:08.7064101Z Collecting annotated-types>=0.6.0 (from pydantic==2.10.6->feast==0.52.0)
+2025-08-23T14:37:08.7101219Z   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+2025-08-23T14:37:09.4339972Z Collecting pydantic-core==2.27.2 (from pydantic==2.10.6->feast==0.52.0)
+2025-08-23T14:37:09.4386758Z   Downloading pydantic_core-2.27.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+2025-08-23T14:37:09.4600857Z Collecting typing-extensions>=4.12.2 (from pydantic==2.10.6->feast==0.52.0)
+2025-08-23T14:37:09.4636802Z   Downloading typing_extensions-4.14.1-py3-none-any.whl.metadata (3.0 kB)
+2025-08-23T14:37:09.4774193Z Collecting h11>=0.8 (from uvicorn==0.34.0->uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:09.4828888Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2025-08-23T14:37:09.5176056Z Collecting httptools>=0.6.3 (from uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:09.5212612Z   Downloading httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.6 kB)
+2025-08-23T14:37:09.5388644Z Collecting python-dotenv>=0.13 (from uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:09.5423179Z   Downloading python_dotenv-1.1.1-py3-none-any.whl.metadata (24 kB)
+2025-08-23T14:37:09.5872458Z Collecting uvloop!=0.15.0,!=0.15.1,>=0.14.0 (from uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:09.5919844Z   Downloading uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+2025-08-23T14:37:09.6693036Z Collecting watchfiles>=0.13 (from uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:09.6726555Z   Downloading watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+2025-08-23T14:37:09.7663367Z Collecting websockets>=10.4 (from uvicorn[standard]==0.34.0->feast==0.52.0)
+2025-08-23T14:37:09.7701883Z   Downloading websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
+2025-08-23T14:37:09.7922207Z Collecting six>=1.5 (from python-dateutil>=2.8.2)
+2025-08-23T14:37:09.7956875Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-08-23T14:37:09.8043818Z INFO: pip is looking at multiple versions of dask-expr to determine which version is compatible with other requirements. This could take a while.
+2025-08-23T14:37:09.8047900Z Collecting dask-expr<1.2,>=1.1 (from dask[dataframe]==2024.8.1)
+2025-08-23T14:37:09.8096020Z   Downloading dask_expr-1.1.20-py3-none-any.whl.metadata (2.6 kB)
+2025-08-23T14:37:09.8182026Z   Downloading dask_expr-1.1.19-py3-none-any.whl.metadata (2.6 kB)
+2025-08-23T14:37:09.8304037Z   Downloading dask_expr-1.1.18-py3-none-any.whl.metadata (2.6 kB)
+2025-08-23T14:37:09.8389925Z   Downloading dask_expr-1.1.16-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:09.8480463Z   Downloading dask_expr-1.1.15-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:09.8557212Z   Downloading dask_expr-1.1.14-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:09.8642930Z   Downloading dask_expr-1.1.13-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:09.8680643Z INFO: pip is still looking at multiple versions of dask-expr to determine which version is compatible with other requirements. This could take a while.
+2025-08-23T14:37:09.8726343Z   Downloading dask_expr-1.1.12-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:09.8801018Z   Downloading dask_expr-1.1.11-py3-none-any.whl.metadata (2.5 kB)
+2025-08-23T14:37:09.9257092Z Collecting starlette<0.48.0,>=0.40.0 (from fastapi>=0.68.0->feast==0.52.0)
+2025-08-23T14:37:09.9316844Z   Downloading starlette-0.47.2-py3-none-any.whl.metadata (6.2 kB)
+2025-08-23T14:37:09.9799666Z Collecting zipp>=3.20 (from importlib-metadata>=4.13.0->dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:09.9832668Z   Downloading zipp-3.23.0-py3-none-any.whl.metadata (3.6 kB)
+2025-08-23T14:37:10.0397926Z Collecting MarkupSafe>=2.0 (from Jinja2<4,>=2->feast==0.52.0)
+2025-08-23T14:37:10.0437688Z   Downloading MarkupSafe-3.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.0 kB)
+2025-08-23T14:37:10.0588748Z Collecting locket (from partd>=1.4.0->dask==2024.8.1->dask[dataframe]==2024.8.1)
+2025-08-23T14:37:10.0622342Z   Downloading locket-1.0.0-py2.py3-none-any.whl.metadata (2.8 kB)
+2025-08-23T14:37:10.2775645Z Collecting greenlet>=1 (from SQLAlchemy>1->SQLAlchemy[mypy]>1->feast==0.52.0)
+2025-08-23T14:37:10.2815774Z   Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (4.1 kB)
+2025-08-23T14:37:10.3954294Z Collecting mypy>=0.910 (from SQLAlchemy[mypy]>1->feast==0.52.0)
+2025-08-23T14:37:10.3990444Z   Downloading mypy-1.17.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.2 kB)
+2025-08-23T14:37:10.4456305Z Collecting attrs>=22.2.0 (from jsonschema->feast==0.52.0)
+2025-08-23T14:37:10.4488766Z   Downloading attrs-25.3.0-py3-none-any.whl.metadata (10 kB)
+2025-08-23T14:37:10.4712516Z Collecting jsonschema-specifications>=2023.03.6 (from jsonschema->feast==0.52.0)
+2025-08-23T14:37:10.4753311Z   Downloading jsonschema_specifications-2025.4.1-py3-none-any.whl.metadata (2.9 kB)
+2025-08-23T14:37:10.5110699Z Collecting referencing>=0.28.4 (from jsonschema->feast==0.52.0)
+2025-08-23T14:37:10.5145971Z   Downloading referencing-0.36.2-py3-none-any.whl.metadata (2.8 kB)
+2025-08-23T14:37:10.7854631Z Collecting rpds-py>=0.7.1 (from jsonschema->feast==0.52.0)
+2025-08-23T14:37:10.7893677Z   Downloading rpds_py-0.27.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+2025-08-23T14:37:10.8845903Z Collecting charset_normalizer<4,>=2 (from requests->feast==0.52.0)
+2025-08-23T14:37:10.8886103Z   Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+2025-08-23T14:37:10.9075984Z Collecting idna<4,>=2.5 (from requests->feast==0.52.0)
+2025-08-23T14:37:10.9113133Z   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+2025-08-23T14:37:10.9575121Z Collecting urllib3<3,>=1.21.1 (from requests->feast==0.52.0)
+2025-08-23T14:37:10.9612033Z   Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+2025-08-23T14:37:10.9851110Z Collecting certifi>=2017.4.17 (from requests->feast==0.52.0)
+2025-08-23T14:37:10.9890741Z   Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+2025-08-23T14:37:11.0310718Z Collecting mypy_extensions>=1.0.0 (from mypy>=0.910->SQLAlchemy[mypy]>1->feast==0.52.0)
+2025-08-23T14:37:11.0344074Z   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+2025-08-23T14:37:11.0489660Z Collecting pathspec>=0.9.0 (from mypy>=0.910->SQLAlchemy[mypy]>1->feast==0.52.0)
+2025-08-23T14:37:11.0525162Z   Downloading pathspec-0.12.1-py3-none-any.whl.metadata (21 kB)
+2025-08-23T14:37:11.1822513Z Collecting anyio<5,>=3.6.2 (from starlette<0.48.0,>=0.40.0->fastapi>=0.68.0->feast==0.52.0)
+2025-08-23T14:37:11.1858769Z   Downloading anyio-4.10.0-py3-none-any.whl.metadata (4.0 kB)
+2025-08-23T14:37:11.2254597Z Collecting sniffio>=1.1 (from anyio<5,>=3.6.2->starlette<0.48.0,>=0.40.0->fastapi>=0.68.0->feast==0.52.0)
+2025-08-23T14:37:11.2289709Z   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+2025-08-23T14:37:11.2482670Z Downloading pandas-2.2.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
+2025-08-23T14:37:11.3380568Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 150.1 MB/s eta 0:00:00
+2025-08-23T14:37:11.3431793Z Downloading dask-2024.8.1-py3-none-any.whl (1.2 MB)
+2025-08-23T14:37:11.3517213Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 157.2 MB/s eta 0:00:00
+2025-08-23T14:37:11.3590518Z Downloading pyarrow-17.0.0-cp311-cp311-manylinux_2_28_x86_64.whl (39.9 MB)
+2025-08-23T14:37:11.5867266Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 39.9/39.9 MB 176.1 MB/s eta 0:00:00
+2025-08-23T14:37:11.5916068Z Downloading feast-0.52.0-py2.py3-none-any.whl (7.6 MB)
+2025-08-23T14:37:11.6500459Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.6/7.6 MB 132.9 MB/s eta 0:00:00
+2025-08-23T14:37:11.6549764Z Downloading redis-5.0.7-py3-none-any.whl (252 kB)
+2025-08-23T14:37:11.6620279Z Downloading pydantic-2.10.6-py3-none-any.whl (431 kB)
+2025-08-23T14:37:11.6690536Z Downloading uvicorn-0.34.0-py3-none-any.whl (62 kB)
+2025-08-23T14:37:11.6751310Z Downloading pydantic_core-2.27.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
+2025-08-23T14:37:11.6858258Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 204.9 MB/s eta 0:00:00
+2025-08-23T14:37:11.6895307Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+2025-08-23T14:37:11.6974295Z Downloading bigtree-0.29.2-py3-none-any.whl (105 kB)
+2025-08-23T14:37:11.7044174Z Downloading click-8.2.1-py3-none-any.whl (102 kB)
+2025-08-23T14:37:11.7110057Z Downloading cloudpickle-3.1.1-py3-none-any.whl (20 kB)
+2025-08-23T14:37:11.7162927Z Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+2025-08-23T14:37:11.7270145Z Downloading dask_expr-1.1.11-py3-none-any.whl (242 kB)
+2025-08-23T14:37:11.7338949Z Downloading dill-0.3.9-py3-none-any.whl (119 kB)
+2025-08-23T14:37:11.7397865Z Downloading fastapi-0.116.1-py3-none-any.whl (95 kB)
+2025-08-23T14:37:11.7454725Z Downloading fsspec-2025.7.0-py3-none-any.whl (199 kB)
+2025-08-23T14:37:11.7517168Z Downloading importlib_metadata-8.7.0-py3-none-any.whl (27 kB)
+2025-08-23T14:37:11.7571310Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+2025-08-23T14:37:11.7634367Z Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+2025-08-23T14:37:11.8275276Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 270.6 MB/s eta 0:00:00
+2025-08-23T14:37:11.8316793Z Downloading packaging-25.0-py3-none-any.whl (66 kB)
+2025-08-23T14:37:11.8385927Z Downloading partd-1.4.2-py3-none-any.whl (18 kB)
+2025-08-23T14:37:11.8441791Z Downloading protobuf-6.32.0-cp39-abi3-manylinux2014_x86_64.whl (322 kB)
+2025-08-23T14:37:11.8508848Z Downloading pygments-2.19.2-py3-none-any.whl (1.2 MB)
+2025-08-23T14:37:11.8593245Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 156.5 MB/s eta 0:00:00
+2025-08-23T14:37:11.8627030Z Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+2025-08-23T14:37:11.8700252Z Downloading PyYAML-6.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (762 kB)
+2025-08-23T14:37:11.8773668Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 763.0/763.0 kB 107.2 MB/s eta 0:00:00
+2025-08-23T14:37:11.8810775Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+2025-08-23T14:37:11.8877432Z Downloading sqlalchemy-2.0.43-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+2025-08-23T14:37:11.9065023Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 188.4 MB/s eta 0:00:00
+2025-08-23T14:37:11.9102195Z Downloading tabulate-0.9.0-py3-none-any.whl (35 kB)
+2025-08-23T14:37:11.9154862Z Downloading tenacity-8.5.0-py3-none-any.whl (28 kB)
+2025-08-23T14:37:11.9220609Z Downloading toml-0.10.2-py2.py3-none-any.whl (16 kB)
+2025-08-23T14:37:11.9273193Z Downloading toolz-1.0.0-py3-none-any.whl (56 kB)
+2025-08-23T14:37:11.9336176Z Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+2025-08-23T14:37:11.9392340Z Downloading typeguard-4.4.4-py3-none-any.whl (34 kB)
+2025-08-23T14:37:11.9449983Z Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+2025-08-23T14:37:11.9525351Z Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
+2025-08-23T14:37:11.9580224Z Downloading jsonschema-4.25.1-py3-none-any.whl (90 kB)
+2025-08-23T14:37:11.9658584Z Downloading mmh3-5.2.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (103 kB)
+2025-08-23T14:37:11.9713251Z Downloading prometheus_client-0.22.1-py3-none-any.whl (58 kB)
+2025-08-23T14:37:11.9774336Z Downloading psutil-7.0.0-cp36-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (277 kB)
+2025-08-23T14:37:11.9845666Z Downloading PyJWT-2.10.1-py3-none-any.whl (22 kB)
+2025-08-23T14:37:11.9911116Z Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+2025-08-23T14:37:11.9978121Z Downloading uvicorn_worker-0.3.0-py3-none-any.whl (5.3 kB)
+2025-08-23T14:37:12.0028696Z Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+2025-08-23T14:37:12.0079292Z Downloading attrs-25.3.0-py3-none-any.whl (63 kB)
+2025-08-23T14:37:12.0135055Z Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+2025-08-23T14:37:12.0195775Z Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (150 kB)
+2025-08-23T14:37:12.0255871Z Downloading greenlet-3.2.4-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (587 kB)
+2025-08-23T14:37:12.0316079Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 587.7/587.7 kB 95.3 MB/s eta 0:00:00
+2025-08-23T14:37:12.0350445Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2025-08-23T14:37:12.0421573Z Downloading httptools-0.6.4-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (459 kB)
+2025-08-23T14:37:12.0496947Z Downloading idna-3.10-py3-none-any.whl (70 kB)
+2025-08-23T14:37:12.0557424Z Downloading jsonschema_specifications-2025.4.1-py3-none-any.whl (18 kB)
+2025-08-23T14:37:12.0657853Z Downloading MarkupSafe-3.0.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (23 kB)
+2025-08-23T14:37:12.0739890Z Downloading mypy-1.17.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (12.6 MB)
+2025-08-23T14:37:12.1385250Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.6/12.6 MB 197.7 MB/s eta 0:00:00
+2025-08-23T14:37:12.1423641Z Downloading python_dotenv-1.1.1-py3-none-any.whl (20 kB)
+2025-08-23T14:37:12.1482464Z Downloading referencing-0.36.2-py3-none-any.whl (26 kB)
+2025-08-23T14:37:12.1535045Z Downloading rpds_py-0.27.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (383 kB)
+2025-08-23T14:37:12.1609384Z Downloading starlette-0.47.2-py3-none-any.whl (72 kB)
+2025-08-23T14:37:12.1674619Z Downloading typing_extensions-4.14.1-py3-none-any.whl (43 kB)
+2025-08-23T14:37:12.1744453Z Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+2025-08-23T14:37:12.1810188Z Downloading uvloop-0.21.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (4.0 MB)
+2025-08-23T14:37:12.2001697Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.0/4.0 MB 225.0 MB/s eta 0:00:00
+2025-08-23T14:37:12.2036643Z Downloading watchfiles-1.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (453 kB)
+2025-08-23T14:37:12.2120530Z Downloading websockets-15.0.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (182 kB)
+2025-08-23T14:37:12.2180948Z Downloading zipp-3.23.0-py3-none-any.whl (10 kB)
+2025-08-23T14:37:12.2235580Z Downloading locket-1.0.0-py2.py3-none-any.whl (4.4 kB)
+2025-08-23T14:37:12.2286836Z Downloading anyio-4.10.0-py3-none-any.whl (107 kB)
+2025-08-23T14:37:12.2342343Z Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+2025-08-23T14:37:12.2394974Z Downloading pathspec-0.12.1-py3-none-any.whl (31 kB)
+2025-08-23T14:37:12.2447781Z Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+2025-08-23T14:37:12.5374693Z Installing collected packages: pytz, zipp, websockets, uvloop, urllib3, tzdata, typing-extensions, tqdm, toolz, toml, tenacity, tabulate, sniffio, six, rpds-py, redis, pyyaml, python-dotenv, pyjwt, pygments, psutil, protobuf, prometheus_client, pathspec, packaging, numpy, mypy_extensions, mmh3, MarkupSafe, locket, idna, httptools, h11, greenlet, fsspec, dill, colorama, cloudpickle, click, charset_normalizer, certifi, bigtree, attrs, annotated-types, uvicorn, typeguard, SQLAlchemy, requests, referencing, python-dateutil, pydantic-core, pyarrow, partd, mypy, Jinja2, importlib-metadata, gunicorn, anyio, watchfiles, uvicorn-worker, starlette, pydantic, pandas, jsonschema-specifications, dask, jsonschema, fastapi, dask-expr, feast
+2025-08-23T14:37:26.8633553Z Successfully installed Jinja2-3.1.6 MarkupSafe-3.0.2 SQLAlchemy-2.0.43 annotated-types-0.7.0 anyio-4.10.0 attrs-25.3.0 bigtree-0.29.2 certifi-2025.8.3 charset_normalizer-3.4.3 click-8.2.1 cloudpickle-3.1.1 colorama-0.4.6 dask-2024.8.1 dask-expr-1.1.11 dill-0.3.9 fastapi-0.116.1 feast-0.52.0 fsspec-2025.7.0 greenlet-3.2.4 gunicorn-23.0.0 h11-0.16.0 httptools-0.6.4 idna-3.10 importlib-metadata-8.7.0 jsonschema-4.25.1 jsonschema-specifications-2025.4.1 locket-1.0.0 mmh3-5.2.0 mypy-1.17.1 mypy_extensions-1.1.0 numpy-2.3.2 packaging-25.0 pandas-2.2.2 partd-1.4.2 pathspec-0.12.1 prometheus_client-0.22.1 protobuf-6.32.0 psutil-7.0.0 pyarrow-17.0.0 pydantic-2.10.6 pydantic-core-2.27.2 pygments-2.19.2 pyjwt-2.10.1 python-dateutil-2.9.0.post0 python-dotenv-1.1.1 pytz-2025.2 pyyaml-6.0.2 redis-5.0.7 referencing-0.36.2 requests-2.32.5 rpds-py-0.27.0 six-1.17.0 sniffio-1.3.1 starlette-0.47.2 tabulate-0.9.0 tenacity-8.5.0 toml-0.10.2 toolz-1.0.0 tqdm-4.67.1 typeguard-4.4.4 typing-extensions-4.14.1 tzdata-2025.2 urllib3-2.5.0 uvicorn-0.34.0 uvicorn-worker-0.3.0 uvloop-0.21.0 watchfiles-1.1.0 websockets-15.0.1 zipp-3.23.0
+2025-08-23T14:37:26.8907077Z 
+2025-08-23T14:37:26.8907806Z [notice] A new release of pip is available: 24.3.1 -> 25.2
+2025-08-23T14:37:26.8908990Z [notice] To update, run: pip install --upgrade pip
+2025-08-23T14:37:27.5765224Z ##[group]Run actions/checkout@v4
+2025-08-23T14:37:27.5765479Z with:
+2025-08-23T14:37:27.5765676Z   repository: deepakkt/2025-dmml-data
+2025-08-23T14:37:27.5766283Z   token: ***
+2025-08-23T14:37:27.5766471Z   path: data-repo
+2025-08-23T14:37:27.5766668Z   ssh-strict: true
+2025-08-23T14:37:27.5766853Z   ssh-user: git
+2025-08-23T14:37:27.5767067Z   persist-credentials: true
+2025-08-23T14:37:27.5767286Z   clean: true
+2025-08-23T14:37:27.5767491Z   sparse-checkout-cone-mode: true
+2025-08-23T14:37:27.5767731Z   fetch-depth: 1
+2025-08-23T14:37:27.5767917Z   fetch-tags: false
+2025-08-23T14:37:27.5768113Z   show-progress: true
+2025-08-23T14:37:27.5768305Z   lfs: false
+2025-08-23T14:37:27.5768690Z   submodules: false
+2025-08-23T14:37:27.5768887Z   set-safe-directory: true
+2025-08-23T14:37:27.5769096Z env:
+2025-08-23T14:37:27.5769272Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:27.5769506Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:27.5769735Z   MAIN_BRANCH: main
+2025-08-23T14:37:27.5770036Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:27.5770252Z   OUT_DIR: transformed-data
+2025-08-23T14:37:27.5770516Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:27.5770872Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:27.5771195Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:27.5771423Z   PROFILE: tree_baseline
+2025-08-23T14:37:27.5771627Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:37:27.5771902Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:27.5772293Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:37:27.5772703Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:27.5773054Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:27.5773399Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:27.5773760Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:37:27.5774064Z ##[endgroup]
+2025-08-23T14:37:27.6692802Z Syncing repository: deepakkt/2025-dmml-data
+2025-08-23T14:37:27.6696218Z ##[group]Getting Git version info
+2025-08-23T14:37:27.6696732Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core/data-repo'
+2025-08-23T14:37:27.6739788Z [command]/usr/bin/git version
+2025-08-23T14:37:27.6775686Z git version 2.51.0
+2025-08-23T14:37:27.6801639Z ##[endgroup]
+2025-08-23T14:37:27.6814556Z Temporarily overriding HOME='/home/runner/work/_temp/bbad5f74-e634-4b4c-9f85-4676efb31037' before making global git config changes
+2025-08-23T14:37:27.6815489Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:37:27.6826067Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo
+2025-08-23T14:37:27.6855336Z ##[group]Initializing the repository
+2025-08-23T14:37:27.6860157Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo
+2025-08-23T14:37:27.6894980Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:37:27.6895853Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:37:27.6896640Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:37:27.6897205Z hint:
+2025-08-23T14:37:27.6897583Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:37:27.6898046Z hint:
+2025-08-23T14:37:27.6898816Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:37:27.6899322Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:37:27.6899672Z hint:
+2025-08-23T14:37:27.6899867Z hint: 	git branch -m <name>
+2025-08-23T14:37:27.6900088Z hint:
+2025-08-23T14:37:27.6900384Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:37:27.6901167Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo/.git/
+2025-08-23T14:37:27.6907524Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-data
+2025-08-23T14:37:27.6937264Z ##[endgroup]
+2025-08-23T14:37:27.6937768Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:37:27.6942238Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:37:27.6969313Z ##[endgroup]
+2025-08-23T14:37:27.6969824Z ##[group]Setting up auth
+2025-08-23T14:37:27.6975645Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:37:27.7003929Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:37:27.7224128Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:37:27.7252789Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:37:27.7474627Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:37:27.7512367Z ##[endgroup]
+2025-08-23T14:37:27.7512857Z ##[group]Determining the default branch
+2025-08-23T14:37:27.7515787Z Retrieving the default branch name
+2025-08-23T14:37:28.0059211Z Default branch 'main'
+2025-08-23T14:37:28.0060088Z ##[endgroup]
+2025-08-23T14:37:28.0060675Z ##[group]Fetching the repository
+2025-08-23T14:37:28.0067019Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+2025-08-23T14:37:29.8748923Z From https://github.com/deepakkt/2025-dmml-data
+2025-08-23T14:37:29.8767093Z  * [new branch]      main       -> origin/main
+2025-08-23T14:37:29.8787193Z ##[endgroup]
+2025-08-23T14:37:29.8789731Z ##[group]Determining the checkout info
+2025-08-23T14:37:29.8790575Z ##[endgroup]
+2025-08-23T14:37:29.8795769Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:37:29.8836125Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:37:29.8863347Z ##[group]Checking out the ref
+2025-08-23T14:37:29.8867699Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:37:30.0179241Z Switched to a new branch 'main'
+2025-08-23T14:37:30.0180525Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:37:30.0194201Z ##[endgroup]
+2025-08-23T14:37:30.0235043Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:37:30.0258007Z bd9a271a0396a95effd32b804fbf8b5c2dfe6d9f
+2025-08-23T14:37:30.0366975Z ##[group]Run python - <<'PY'
+2025-08-23T14:37:30.0367269Z [36;1mpython - <<'PY'[0m
+2025-08-23T14:37:30.0367484Z [36;1mimport time, redis[0m
+2025-08-23T14:37:30.0367693Z [36;1mfor i in range(30):[0m
+2025-08-23T14:37:30.0367914Z [36;1m    try:[0m
+2025-08-23T14:37:30.0368157Z [36;1m        r = redis.Redis(host='localhost', port=6379, db=0)[0m
+2025-08-23T14:37:30.0368832Z [36;1m        r.ping()[0m
+2025-08-23T14:37:30.0369085Z [36;1m        print("Redis is ready"); break[0m
+2025-08-23T14:37:30.0369361Z [36;1m    except Exception as e:[0m
+2025-08-23T14:37:30.0369644Z [36;1m        print("Waiting for Redis...", e); time.sleep(2)[0m
+2025-08-23T14:37:30.0369928Z [36;1melse:[0m
+2025-08-23T14:37:30.0370135Z [36;1m    raise SystemExit("Redis not ready")[0m
+2025-08-23T14:37:30.0370376Z [36;1mPY[0m
+2025-08-23T14:37:30.0413155Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:37:30.0413379Z env:
+2025-08-23T14:37:30.0413560Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:30.0413817Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:30.0414040Z   MAIN_BRANCH: main
+2025-08-23T14:37:30.0414228Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:30.0414429Z   OUT_DIR: transformed-data
+2025-08-23T14:37:30.0414865Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:30.0415266Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:30.0415586Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:30.0415803Z   PROFILE: tree_baseline
+2025-08-23T14:37:30.0416008Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:37:30.0416270Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.0416667Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:37:30.0417058Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.0417440Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.0417786Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.0418136Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:37:30.0418607Z ##[endgroup]
+2025-08-23T14:37:30.2754738Z Redis is ready
+2025-08-23T14:37:30.2941310Z ##[group]Run python tools/feature_store/build_feature_store.py \
+2025-08-23T14:37:30.2941790Z [36;1mpython tools/feature_store/build_feature_store.py \[0m
+2025-08-23T14:37:30.2942131Z [36;1m  --data-repo ./data-repo \[0m
+2025-08-23T14:37:30.2942401Z [36;1m  --repo-path ./feature_repo \[0m
+2025-08-23T14:37:30.2942676Z [36;1m  --redis "localhost:6379,db=0" \[0m
+2025-08-23T14:37:30.2942943Z [36;1m  --apply \[0m
+2025-08-23T14:37:30.2943167Z [36;1m  --materialize \[0m
+2025-08-23T14:37:30.2943402Z [36;1m  --generate-catalog[0m
+2025-08-23T14:37:30.2984320Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:37:30.2984554Z env:
+2025-08-23T14:37:30.2984750Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:30.2984996Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:30.2985223Z   MAIN_BRANCH: main
+2025-08-23T14:37:30.2985423Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:30.2985649Z   OUT_DIR: transformed-data
+2025-08-23T14:37:30.2985956Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:30.2986321Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:30.2986651Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:30.2986888Z   PROFILE: tree_baseline
+2025-08-23T14:37:30.2987108Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:37:30.2987384Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.2987791Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:37:30.2988185Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.2988757Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.2989132Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:30.2989505Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:37:30.2989805Z ##[endgroup]
+2025-08-23T14:37:33.9652817Z 
+2025-08-23T14:37:33.9653411Z === DATA QUALITY REPORT (soft validation) ===
+2025-08-23T14:37:33.9654295Z - plan exclusivity: 815 row(s) -> plan_0 + plan_1 + plan_2 must equal 1
+2025-08-23T14:37:33.9664107Z              customer_id                 asof_date
+2025-08-23T14:37:33.9664639Z 68a209a39fc554f31784b915 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9665129Z 68a209a39fc554f31784b985 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9665603Z 68a209a39fc554f31784ba5c 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9666063Z 68a209a39fc554f31784bab8 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9666534Z 68a209a49fc554f31784bb31 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9666999Z 68a209a49fc554f31784bb5b 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9667462Z 68a209a49fc554f31784bb98 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9667922Z 68a209a49fc554f31784bbf3 2025-08-17 00:00:00+00:00
+2025-08-23T14:37:33.9668627Z Summary: total=41000, dropped=815, kept=40185
+2025-08-23T14:37:33.9668919Z ============================================
+2025-08-23T14:37:33.9669087Z 
+2025-08-23T14:37:34.4753583Z Materializing [1m[32m1[0m feature views to [1m[32m2025-08-23 14:37:34+00:00[0m into the [1m[32mredis[0m online store.
+2025-08-23T14:37:34.4754488Z 
+2025-08-23T14:37:34.4754967Z [1m[32mcustomer_features_v1[0m from [1m[32m2024-08-23 14:37:34+00:00[0m to [1m[32m2025-08-23 14:37:34+00:00[0m:
+2025-08-23T14:37:40.9743912Z Done.
+2025-08-23T14:37:41.1762725Z ##[group]Run set -euo pipefail
+2025-08-23T14:37:41.1763028Z [36;1mset -euo pipefail[0m
+2025-08-23T14:37:41.1763286Z [36;1mgit config user.name "github-actions[bot]"[0m
+2025-08-23T14:37:41.1763696Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+2025-08-23T14:37:41.1764130Z [36;1mgit config --global --add safe.directory "$PWD"[0m
+2025-08-23T14:37:41.1764507Z [36;1mgit add docs/FEATURE_CATALOG.md docs/feature_catalog.csv || true[0m
+2025-08-23T14:37:41.1764871Z [36;1mif git diff --cached --quiet; then[0m
+2025-08-23T14:37:41.1765145Z [36;1m  echo "No catalog changes."; exit 0[0m
+2025-08-23T14:37:41.1765387Z [36;1mfi[0m
+2025-08-23T14:37:41.1765618Z [36;1mgit commit -m "feat(feast): update feature catalog"[0m
+2025-08-23T14:37:41.1765968Z [36;1mTOKEN="${GITHUB_TOKEN:-${DATA_REPO_TOKEN:-}}"[0m
+2025-08-23T14:37:41.1766340Z [36;1mif [ -z "$TOKEN" ]; then echo "No token available to push"; exit 1; fi[0m
+2025-08-23T14:37:41.1766873Z [36;1mgit remote set-url origin "https://x-access-token:${TOKEN}@github.com/${GH_REPO}.git"[0m
+2025-08-23T14:37:41.1767297Z [36;1mgit push origin "HEAD:${GH_BRANCH}"[0m
+2025-08-23T14:37:41.1807794Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:37:41.1808013Z env:
+2025-08-23T14:37:41.1808188Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:37:41.1808659Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:37:41.1808878Z   MAIN_BRANCH: main
+2025-08-23T14:37:41.1809073Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:37:41.1809293Z   OUT_DIR: transformed-data
+2025-08-23T14:37:41.1809555Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:37:41.1809916Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:37:41.1810230Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:37:41.1810444Z   PROFILE: tree_baseline
+2025-08-23T14:37:41.1810660Z   PYTHONUNBUFFERED: 1
+2025-08-23T14:37:41.1810923Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:41.1811315Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:37:41.1811705Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:41.1812049Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:41.1812388Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:37:41.1812721Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:37:41.1813023Z   GH_REPO: deepakkt/2025-dmml-core
+2025-08-23T14:37:41.1813242Z   GH_BRANCH: main
+2025-08-23T14:37:41.1813619Z   GITHUB_TOKEN: ***
+2025-08-23T14:37:41.1814099Z   DATA_REPO_TOKEN: ***
+2025-08-23T14:37:41.1814293Z ##[endgroup]
+2025-08-23T14:37:41.2058000Z No catalog changes.
+2025-08-23T14:37:41.2108610Z Post job cleanup.
+2025-08-23T14:37:41.3034865Z [command]/usr/bin/git version
+2025-08-23T14:37:41.3069982Z git version 2.51.0
+2025-08-23T14:37:41.3108114Z Copying '/home/runner/.gitconfig' to '/home/runner/work/_temp/e1a20228-f1d7-40ef-8227-605e2c78ed13/.gitconfig'
+2025-08-23T14:37:41.3118736Z Temporarily overriding HOME='/home/runner/work/_temp/e1a20228-f1d7-40ef-8227-605e2c78ed13' before making global git config changes
+2025-08-23T14:37:41.3120059Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:37:41.3125254Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core/data-repo
+2025-08-23T14:37:41.3165215Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:37:41.3196913Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:37:41.3425324Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:37:41.3446398Z http.https://github.com/.extraheader
+2025-08-23T14:37:41.3460343Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:37:41.3494069Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:37:41.3814485Z Post job cleanup.
+2025-08-23T14:37:41.5389134Z Post job cleanup.
+2025-08-23T14:37:41.6323269Z [command]/usr/bin/git version
+2025-08-23T14:37:41.6363677Z git version 2.51.0
+2025-08-23T14:37:41.6401509Z Copying '/home/runner/.gitconfig' to '/home/runner/work/_temp/722343b0-6132-4de7-b077-e22522cec61c/.gitconfig'
+2025-08-23T14:37:41.6412970Z Temporarily overriding HOME='/home/runner/work/_temp/722343b0-6132-4de7-b077-e22522cec61c' before making global git config changes
+2025-08-23T14:37:41.6414264Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:37:41.6427400Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:37:41.6463234Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:37:41.6497546Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:37:41.6744728Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:37:41.6767740Z http.https://github.com/.extraheader
+2025-08-23T14:37:41.6781577Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:37:41.6813682Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:37:41.7152458Z Print service container logs: a8f4f66dfb404b44939338378cc37fc0_redis7_50dc6d
+2025-08-23T14:37:41.7156682Z ##[command]/usr/bin/docker logs --details e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:37:41.7276680Z  1:C 23 Aug 2025 14:36:53.209 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+2025-08-23T14:37:41.7279584Z  1:C 23 Aug 2025 14:36:53.209 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+2025-08-23T14:37:41.7280394Z  1:C 23 Aug 2025 14:36:53.209 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+2025-08-23T14:37:41.7281689Z  1:C 23 Aug 2025 14:36:53.209 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+2025-08-23T14:37:41.7282752Z  1:M 23 Aug 2025 14:36:53.209 * monotonic clock: POSIX clock_gettime
+2025-08-23T14:37:41.7283348Z  1:M 23 Aug 2025 14:36:53.210 * Running mode=standalone, port=6379.
+2025-08-23T14:37:41.7283900Z  1:M 23 Aug 2025 14:36:53.210 * Server initialized
+2025-08-23T14:37:41.7284419Z  1:M 23 Aug 2025 14:36:53.210 * Ready to accept connections tcp
+2025-08-23T14:37:41.7295223Z Stop and remove container: a8f4f66dfb404b44939338378cc37fc0_redis7_50dc6d
+2025-08-23T14:37:41.7299885Z ##[command]/usr/bin/docker rm --force e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:37:42.9969928Z e8e9b48f77155b34f8d10b205b358863a9e84cda2ba530979a347ae51c05f8c6
+2025-08-23T14:37:42.9996521Z Remove container network: github_network_c55148aa0cb3421685f6bbf78783032b
+2025-08-23T14:37:43.0001573Z ##[command]/usr/bin/docker network rm github_network_c55148aa0cb3421685f6bbf78783032b
+2025-08-23T14:37:43.1064754Z github_network_c55148aa0cb3421685f6bbf78783032b
+2025-08-23T14:37:43.1123098Z Cleaning up orphan processes

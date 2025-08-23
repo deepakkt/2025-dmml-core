@@ -1,0 +1,287 @@
+﻿2025-08-23T14:36:24.8477662Z Current runner version: '2.328.0'
+2025-08-23T14:36:24.8503684Z ##[group]Runner Image Provisioner
+2025-08-23T14:36:24.8504548Z Hosted Compute Agent
+2025-08-23T14:36:24.8505063Z Version: 20250821.380
+2025-08-23T14:36:24.8505924Z Commit: 438d12cb4fe092871db9867344e3bc0bc5319035
+2025-08-23T14:36:24.8506598Z Build Date: 2025-08-21T20:49:43Z
+2025-08-23T14:36:24.8507191Z ##[endgroup]
+2025-08-23T14:36:24.8507786Z ##[group]Operating System
+2025-08-23T14:36:24.8508345Z Ubuntu
+2025-08-23T14:36:24.8508815Z 24.04.2
+2025-08-23T14:36:24.8509215Z LTS
+2025-08-23T14:36:24.8509744Z ##[endgroup]
+2025-08-23T14:36:24.8510230Z ##[group]Runner Image
+2025-08-23T14:36:24.8510751Z Image: ubuntu-24.04
+2025-08-23T14:36:24.8511321Z Version: 20250818.1.0
+2025-08-23T14:36:24.8512338Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250818.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-23T14:36:24.8513884Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250818.1
+2025-08-23T14:36:24.8514868Z ##[endgroup]
+2025-08-23T14:36:24.8516196Z ##[group]GITHUB_TOKEN Permissions
+2025-08-23T14:36:24.8518044Z Contents: write
+2025-08-23T14:36:24.8518571Z Metadata: read
+2025-08-23T14:36:24.8519174Z ##[endgroup]
+2025-08-23T14:36:24.8521252Z Secret source: Actions
+2025-08-23T14:36:24.8521959Z Prepare workflow directory
+2025-08-23T14:36:24.9041607Z Prepare all required actions
+2025-08-23T14:36:24.9080841Z Getting action download info
+2025-08-23T14:36:25.2998702Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-08-23T14:36:25.3800381Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2025-08-23T14:36:25.5627770Z Complete job name: transform
+2025-08-23T14:36:25.6243952Z ##[group]Run actions/checkout@v4
+2025-08-23T14:36:25.6244791Z with:
+2025-08-23T14:36:25.6245202Z   repository: deepakkt/2025-dmml-core
+2025-08-23T14:36:25.6246098Z   token: ***
+2025-08-23T14:36:25.6246495Z   ssh-strict: true
+2025-08-23T14:36:25.6246902Z   ssh-user: git
+2025-08-23T14:36:25.6247306Z   persist-credentials: true
+2025-08-23T14:36:25.6247746Z   clean: true
+2025-08-23T14:36:25.6248149Z   sparse-checkout-cone-mode: true
+2025-08-23T14:36:25.6248630Z   fetch-depth: 1
+2025-08-23T14:36:25.6249016Z   fetch-tags: false
+2025-08-23T14:36:25.6249421Z   show-progress: true
+2025-08-23T14:36:25.6249823Z   lfs: false
+2025-08-23T14:36:25.6250194Z   submodules: false
+2025-08-23T14:36:25.6250602Z   set-safe-directory: true
+2025-08-23T14:36:25.6251255Z env:
+2025-08-23T14:36:25.6251635Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:25.6252136Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:25.6252645Z   MAIN_BRANCH: main
+2025-08-23T14:36:25.6253096Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:25.6253579Z   OUT_DIR: transformed-data
+2025-08-23T14:36:25.6254106Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:25.6254810Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:25.6255650Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:25.6256122Z   PROFILE: tree_baseline
+2025-08-23T14:36:25.6256536Z ##[endgroup]
+2025-08-23T14:36:25.7322676Z Syncing repository: deepakkt/2025-dmml-core
+2025-08-23T14:36:25.7324365Z ##[group]Getting Git version info
+2025-08-23T14:36:25.7325122Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:36:25.7326403Z [command]/usr/bin/git version
+2025-08-23T14:36:25.7374048Z git version 2.51.0
+2025-08-23T14:36:25.7400378Z ##[endgroup]
+2025-08-23T14:36:25.7414907Z Temporarily overriding HOME='/home/runner/work/_temp/fa70a6e2-6d32-42a3-9b9f-14519949938b' before making global git config changes
+2025-08-23T14:36:25.7416546Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:36:25.7427827Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:36:25.7462887Z Deleting the contents of '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:36:25.7466800Z ##[group]Initializing the repository
+2025-08-23T14:36:25.7470675Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:36:25.7553344Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:36:25.7554972Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:36:25.7556754Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:36:25.7557649Z hint:
+2025-08-23T14:36:25.7558166Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:36:25.7558748Z hint:
+2025-08-23T14:36:25.7559308Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:36:25.7560223Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:36:25.7561007Z hint:
+2025-08-23T14:36:25.7561655Z hint: 	git branch -m <name>
+2025-08-23T14:36:25.7562337Z hint:
+2025-08-23T14:36:25.7562949Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:36:25.7563989Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/.git/
+2025-08-23T14:36:25.7567326Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:36:25.7602339Z ##[endgroup]
+2025-08-23T14:36:25.7603091Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:36:25.7606458Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:36:25.7634113Z ##[endgroup]
+2025-08-23T14:36:25.7634807Z ##[group]Setting up auth
+2025-08-23T14:36:25.7641214Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:36:25.7673247Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:36:25.7963797Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:36:25.7995114Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:36:25.8228289Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:36:25.8273135Z ##[endgroup]
+2025-08-23T14:36:25.8274092Z ##[group]Fetching the repository
+2025-08-23T14:36:25.8286551Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2ec502390f832756844845b8b748c1bfa6ab1b7f:refs/remotes/origin/main
+2025-08-23T14:36:26.4534115Z From https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:36:26.4536158Z  * [new ref]         2ec502390f832756844845b8b748c1bfa6ab1b7f -> origin/main
+2025-08-23T14:36:26.4568551Z ##[endgroup]
+2025-08-23T14:36:26.4571446Z ##[group]Determining the checkout info
+2025-08-23T14:36:26.4572929Z ##[endgroup]
+2025-08-23T14:36:26.4577163Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:36:26.4620771Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:36:26.4651260Z ##[group]Checking out the ref
+2025-08-23T14:36:26.4654573Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:36:26.4918275Z Switched to a new branch 'main'
+2025-08-23T14:36:26.4919396Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:36:26.4926994Z ##[endgroup]
+2025-08-23T14:36:26.4966074Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:36:26.4987946Z 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:36:26.5174020Z ##[group]Run test -f "$SPEC_PATH" || (echo "Missing spec at $SPEC_PATH" && exit 1)
+2025-08-23T14:36:26.5175472Z [36;1mtest -f "$SPEC_PATH" || (echo "Missing spec at $SPEC_PATH" && exit 1)[0m
+2025-08-23T14:36:26.5176674Z [36;1mtest -f "$SCRIPT_PATH" || (echo "Missing transformer at $SCRIPT_PATH" && exit 1)[0m
+2025-08-23T14:36:26.5248402Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:36:26.5248955Z env:
+2025-08-23T14:36:26.5249341Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:26.5249852Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:26.5250364Z   MAIN_BRANCH: main
+2025-08-23T14:36:26.5250786Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:26.5251272Z   OUT_DIR: transformed-data
+2025-08-23T14:36:26.5251870Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:26.5252698Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:26.5253441Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:26.5253949Z   PROFILE: tree_baseline
+2025-08-23T14:36:26.5254445Z ##[endgroup]
+2025-08-23T14:36:26.5449264Z ##[group]Run actions/setup-python@v5
+2025-08-23T14:36:26.5449973Z with:
+2025-08-23T14:36:26.5450381Z   python-version: 3.11
+2025-08-23T14:36:26.5450865Z   check-latest: false
+2025-08-23T14:36:26.5451508Z   token: ***
+2025-08-23T14:36:26.5452054Z   update-environment: true
+2025-08-23T14:36:26.5452828Z   allow-prereleases: false
+2025-08-23T14:36:26.5453405Z   freethreaded: false
+2025-08-23T14:36:26.5454032Z env:
+2025-08-23T14:36:26.5454414Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:26.5454936Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:26.5455626Z   MAIN_BRANCH: main
+2025-08-23T14:36:26.5456061Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:26.5456564Z   OUT_DIR: transformed-data
+2025-08-23T14:36:26.5457180Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:26.5458053Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:26.5458830Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:26.5459350Z   PROFILE: tree_baseline
+2025-08-23T14:36:26.5459867Z ##[endgroup]
+2025-08-23T14:36:26.7202152Z ##[group]Installed versions
+2025-08-23T14:36:26.7750745Z Successfully set up CPython (3.11.13)
+2025-08-23T14:36:26.7753116Z ##[endgroup]
+2025-08-23T14:36:26.7887202Z ##[group]Run python -m pip install --upgrade pip
+2025-08-23T14:36:26.7888956Z [36;1mpython -m pip install --upgrade pip[0m
+2025-08-23T14:36:26.7890602Z [36;1mpip install pandas numpy python-dateutil[0m
+2025-08-23T14:36:26.8136736Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:36:26.8137970Z env:
+2025-08-23T14:36:26.8138911Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:26.8140112Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:26.8141327Z   MAIN_BRANCH: main
+2025-08-23T14:36:26.8142344Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:26.8143496Z   OUT_DIR: transformed-data
+2025-08-23T14:36:26.8144851Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:26.8146821Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:26.8148466Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:26.8149596Z   PROFILE: tree_baseline
+2025-08-23T14:36:26.8150930Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:26.8153082Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:36:26.8155041Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:26.8156883Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:26.8158811Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:26.8160559Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:36:26.8162021Z ##[endgroup]
+2025-08-23T14:36:29.2672355Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages (25.2)
+2025-08-23T14:36:30.4340119Z Collecting pandas
+2025-08-23T14:36:30.4677081Z   Downloading pandas-2.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (91 kB)
+2025-08-23T14:36:30.6741971Z Collecting numpy
+2025-08-23T14:36:30.6773998Z   Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2025-08-23T14:36:30.7056555Z Collecting python-dateutil
+2025-08-23T14:36:30.7087628Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+2025-08-23T14:36:30.7532380Z Collecting pytz>=2020.1 (from pandas)
+2025-08-23T14:36:30.7565035Z   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+2025-08-23T14:36:30.7741001Z Collecting tzdata>=2022.7 (from pandas)
+2025-08-23T14:36:30.7770452Z   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+2025-08-23T14:36:30.7923245Z Collecting six>=1.5 (from python-dateutil)
+2025-08-23T14:36:30.7951456Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-08-23T14:36:30.8032159Z Downloading pandas-2.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.4 MB)
+2025-08-23T14:36:30.8858147Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.4/12.4 MB 169.2 MB/s  0:00:00
+2025-08-23T14:36:30.8893174Z Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+2025-08-23T14:36:30.9758617Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 212.4 MB/s  0:00:00
+2025-08-23T14:36:30.9789014Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+2025-08-23T14:36:30.9857422Z Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+2025-08-23T14:36:30.9933173Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+2025-08-23T14:36:30.9984735Z Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+2025-08-23T14:36:31.1084863Z Installing collected packages: pytz, tzdata, six, numpy, python-dateutil, pandas
+2025-08-23T14:36:37.5350526Z 
+2025-08-23T14:36:37.5362319Z Successfully installed numpy-2.3.2 pandas-2.3.2 python-dateutil-2.9.0.post0 pytz-2025.2 six-1.17.0 tzdata-2025.2
+2025-08-23T14:36:37.6277367Z ##[group]Run git clone \
+2025-08-23T14:36:37.6277685Z [36;1mgit clone \[0m
+2025-08-23T14:36:37.6278761Z [36;1m  ***github.com/deepakkt/2025-dmml-data.git \[0m
+2025-08-23T14:36:37.6279068Z [36;1m  ../2025-dmml-data[0m
+2025-08-23T14:36:37.6321842Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:36:37.6322121Z env:
+2025-08-23T14:36:37.6322316Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:37.6322573Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:37.6322798Z   MAIN_BRANCH: main
+2025-08-23T14:36:37.6322993Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:37.6323194Z   OUT_DIR: transformed-data
+2025-08-23T14:36:37.6323468Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:37.6323825Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:37.6324143Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:37.6324360Z   PROFILE: tree_baseline
+2025-08-23T14:36:37.6324627Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:37.6325073Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:36:37.6325602Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:37.6325962Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:37.6326308Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:37.6326650Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:36:37.6326937Z ##[endgroup]
+2025-08-23T14:36:37.6404993Z Cloning into '../2025-dmml-data'...
+2025-08-23T14:36:39.4086789Z ##[group]Run python "$SCRIPT_PATH" \
+2025-08-23T14:36:39.4087122Z [36;1mpython "$SCRIPT_PATH" \[0m
+2025-08-23T14:36:39.4087357Z [36;1m  --spec "$SPEC_PATH" \[0m
+2025-08-23T14:36:39.4087669Z [36;1m  --input "../2025-dmml-data/prepared-data/prepared.csv" \[0m
+2025-08-23T14:36:39.4088087Z [36;1m  --out-csv "../2025-dmml-data/transformed-data/transformed.csv" \[0m
+2025-08-23T14:36:39.4088519Z [36;1m  --out-sqlite "../2025-dmml-data/transformed-data/transformed.sqlite" \[0m
+2025-08-23T14:36:39.4088878Z [36;1m  --table-name "$TABLE_NAME" \[0m
+2025-08-23T14:36:39.4089119Z [36;1m  --profile "$PROFILE"[0m
+2025-08-23T14:36:39.4129871Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:36:39.4130089Z env:
+2025-08-23T14:36:39.4130267Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:39.4130479Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:39.4130691Z   MAIN_BRANCH: main
+2025-08-23T14:36:39.4130871Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:39.4131256Z   OUT_DIR: transformed-data
+2025-08-23T14:36:39.4131551Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:39.4131908Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:39.4132222Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:39.4132429Z   PROFILE: tree_baseline
+2025-08-23T14:36:39.4132700Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:39.4133102Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:36:39.4133486Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:39.4133827Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:39.4134175Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:39.4134514Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:36:39.4134813Z ##[endgroup]
+2025-08-23T14:36:40.9399566Z 2025-08-23 14:36:40,939 INFO Wrote ../2025-dmml-data/transformed-data/transformed.csv and ../2025-dmml-data/transformed-data/transformed.sqlite
+2025-08-23T14:36:41.0032104Z ##[group]Run git config user.name "github-actions[bot]"
+2025-08-23T14:36:41.0032513Z [36;1mgit config user.name "github-actions[bot]"[0m
+2025-08-23T14:36:41.0032947Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+2025-08-23T14:36:41.0033386Z [36;1mmkdir -p "transformed-data"[0m
+2025-08-23T14:36:41.0033886Z [36;1mgit add "transformed-data/transformed.csv" "transformed-data/transformed.sqlite" || true[0m
+2025-08-23T14:36:41.0034368Z [36;1mif ! git diff --cached --quiet; then[0m
+2025-08-23T14:36:41.0034838Z [36;1m  git commit -m "feat(transform): update transformed outputs ($(date -u +'%Y-%m-%dT%H:%M:%SZ'))"[0m
+2025-08-23T14:36:41.0035514Z [36;1m  git push origin HEAD:${MAIN_BRANCH}[0m
+2025-08-23T14:36:41.0035849Z [36;1melse[0m
+2025-08-23T14:36:41.0036063Z [36;1m  echo "No changes to commit."[0m
+2025-08-23T14:36:41.0036312Z [36;1mfi[0m
+2025-08-23T14:36:41.0076497Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:36:41.0076800Z env:
+2025-08-23T14:36:41.0076992Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:36:41.0077236Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:36:41.0077471Z   MAIN_BRANCH: main
+2025-08-23T14:36:41.0077675Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:36:41.0077901Z   OUT_DIR: transformed-data
+2025-08-23T14:36:41.0078170Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:36:41.0078551Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:36:41.0078887Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:36:41.0079117Z   PROFILE: tree_baseline
+2025-08-23T14:36:41.0079408Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:41.0079818Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:36:41.0080214Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:41.0080579Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:41.0080957Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:36:41.0081316Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:36:41.0081638Z ##[endgroup]
+2025-08-23T14:36:41.4685741Z [main bd9a271] feat(transform): update transformed outputs (2025-08-23T14:36:41Z)
+2025-08-23T14:36:41.4686694Z  2 files changed, 1405 insertions(+), 405 deletions(-)
+2025-08-23T14:36:44.1757635Z To https://github.com/deepakkt/2025-dmml-data.git
+2025-08-23T14:36:44.1758216Z    72c0239..bd9a271  HEAD -> main
+2025-08-23T14:36:44.1886838Z Post job cleanup.
+2025-08-23T14:36:44.3574998Z Post job cleanup.
+2025-08-23T14:36:44.4570679Z [command]/usr/bin/git version
+2025-08-23T14:36:44.4610768Z git version 2.51.0
+2025-08-23T14:36:44.4659354Z Temporarily overriding HOME='/home/runner/work/_temp/716a64a8-aa13-4edb-958e-6bc3a56b642f' before making global git config changes
+2025-08-23T14:36:44.4660694Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:36:44.4667045Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:36:44.4709845Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:36:44.4751191Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:36:44.4999503Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:36:44.5024254Z http.https://github.com/.extraheader
+2025-08-23T14:36:44.5038007Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:36:44.5071138Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:36:44.5419004Z Cleaning up orphan processes

@@ -1,0 +1,360 @@
+﻿2025-08-23T14:35:37.9185363Z Current runner version: '2.328.0'
+2025-08-23T14:35:37.9209867Z ##[group]Runner Image Provisioner
+2025-08-23T14:35:37.9210598Z Hosted Compute Agent
+2025-08-23T14:35:37.9211272Z Version: 20250818.377
+2025-08-23T14:35:37.9211867Z Commit: 3c593e9f75fe0b87e893bca80d6e12ba089c61fc
+2025-08-23T14:35:37.9212646Z Build Date: 2025-08-18T14:52:18Z
+2025-08-23T14:35:37.9213283Z ##[endgroup]
+2025-08-23T14:35:37.9214017Z ##[group]Operating System
+2025-08-23T14:35:37.9214654Z Ubuntu
+2025-08-23T14:35:37.9215127Z 24.04.2
+2025-08-23T14:35:37.9215535Z LTS
+2025-08-23T14:35:37.9216052Z ##[endgroup]
+2025-08-23T14:35:37.9216553Z ##[group]Runner Image
+2025-08-23T14:35:37.9217053Z Image: ubuntu-24.04
+2025-08-23T14:35:37.9217579Z Version: 20250818.1.0
+2025-08-23T14:35:37.9218555Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250818.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-23T14:35:37.9220123Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250818.1
+2025-08-23T14:35:37.9221155Z ##[endgroup]
+2025-08-23T14:35:37.9222102Z ##[group]GITHUB_TOKEN Permissions
+2025-08-23T14:35:37.9224383Z Contents: write
+2025-08-23T14:35:37.9224953Z Metadata: read
+2025-08-23T14:35:37.9225480Z ##[endgroup]
+2025-08-23T14:35:37.9227537Z Secret source: Actions
+2025-08-23T14:35:37.9228254Z Prepare workflow directory
+2025-08-23T14:35:37.9734997Z Prepare all required actions
+2025-08-23T14:35:37.9773301Z Getting action download info
+2025-08-23T14:35:38.2515754Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+2025-08-23T14:35:38.3348358Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2025-08-23T14:35:38.5186812Z Complete job name: validate
+2025-08-23T14:35:38.5832525Z ##[group]Run actions/checkout@v4
+2025-08-23T14:35:38.5833354Z with:
+2025-08-23T14:35:38.5833918Z   repository: deepakkt/2025-dmml-core
+2025-08-23T14:35:38.5834593Z   token: ***
+2025-08-23T14:35:38.5834966Z   ssh-strict: true
+2025-08-23T14:35:38.5835369Z   ssh-user: git
+2025-08-23T14:35:38.5835762Z   persist-credentials: true
+2025-08-23T14:35:38.5836189Z   clean: true
+2025-08-23T14:35:38.5836575Z   sparse-checkout-cone-mode: true
+2025-08-23T14:35:38.5837040Z   fetch-depth: 1
+2025-08-23T14:35:38.5837413Z   fetch-tags: false
+2025-08-23T14:35:38.5837802Z   show-progress: true
+2025-08-23T14:35:38.5838191Z   lfs: false
+2025-08-23T14:35:38.5838549Z   submodules: false
+2025-08-23T14:35:38.5838942Z   set-safe-directory: true
+2025-08-23T14:35:38.5839595Z env:
+2025-08-23T14:35:38.5839969Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:38.5840415Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:38.5840862Z   MAIN_BRANCH: main
+2025-08-23T14:35:38.5841254Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:38.5841718Z   OUT_DIR: transformed-data
+2025-08-23T14:35:38.5842224Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:38.5842911Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:38.5843667Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:38.5844129Z   PROFILE: tree_baseline
+2025-08-23T14:35:38.5844539Z ##[endgroup]
+2025-08-23T14:35:38.6895432Z Syncing repository: deepakkt/2025-dmml-core
+2025-08-23T14:35:38.6897319Z ##[group]Getting Git version info
+2025-08-23T14:35:38.6898082Z Working directory is '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:35:38.6899068Z [command]/usr/bin/git version
+2025-08-23T14:35:38.6973945Z git version 2.51.0
+2025-08-23T14:35:38.7000024Z ##[endgroup]
+2025-08-23T14:35:38.7016676Z Temporarily overriding HOME='/home/runner/work/_temp/f7df619b-8c6a-4c9e-9135-cf3b80cc384e' before making global git config changes
+2025-08-23T14:35:38.7019042Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:35:38.7031290Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:35:38.7068795Z Deleting the contents of '/home/runner/work/2025-dmml-core/2025-dmml-core'
+2025-08-23T14:35:38.7072289Z ##[group]Initializing the repository
+2025-08-23T14:35:38.7077931Z [command]/usr/bin/git init /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:35:38.7164685Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-23T14:35:38.7166179Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-23T14:35:38.7167541Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-23T14:35:38.7168371Z hint:
+2025-08-23T14:35:38.7169189Z hint: 	git config --global init.defaultBranch <name>
+2025-08-23T14:35:38.7170195Z hint:
+2025-08-23T14:35:38.7171163Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-23T14:35:38.7172765Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-23T14:35:38.7174241Z hint:
+2025-08-23T14:35:38.7174929Z hint: 	git branch -m <name>
+2025-08-23T14:35:38.7175661Z hint:
+2025-08-23T14:35:38.7176636Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-23T14:35:38.7178414Z Initialized empty Git repository in /home/runner/work/2025-dmml-core/2025-dmml-core/.git/
+2025-08-23T14:35:38.7181320Z [command]/usr/bin/git remote add origin https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:35:38.7222348Z ##[endgroup]
+2025-08-23T14:35:38.7223803Z ##[group]Disabling automatic garbage collection
+2025-08-23T14:35:38.7227531Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-23T14:35:38.7256212Z ##[endgroup]
+2025-08-23T14:35:38.7257382Z ##[group]Setting up auth
+2025-08-23T14:35:38.7263965Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:35:38.7294753Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:35:38.7606627Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:35:38.7639523Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:35:38.7865592Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-23T14:35:38.7901638Z ##[endgroup]
+2025-08-23T14:35:38.7902886Z ##[group]Fetching the repository
+2025-08-23T14:35:38.7911821Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2ec502390f832756844845b8b748c1bfa6ab1b7f:refs/remotes/origin/main
+2025-08-23T14:35:39.4002678Z From https://github.com/deepakkt/2025-dmml-core
+2025-08-23T14:35:39.4004047Z  * [new ref]         2ec502390f832756844845b8b748c1bfa6ab1b7f -> origin/main
+2025-08-23T14:35:39.4041197Z ##[endgroup]
+2025-08-23T14:35:39.4042516Z ##[group]Determining the checkout info
+2025-08-23T14:35:39.4044478Z ##[endgroup]
+2025-08-23T14:35:39.4049793Z [command]/usr/bin/git sparse-checkout disable
+2025-08-23T14:35:39.4096683Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-23T14:35:39.4128654Z ##[group]Checking out the ref
+2025-08-23T14:35:39.4133231Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-23T14:35:39.4399509Z Switched to a new branch 'main'
+2025-08-23T14:35:39.4402096Z branch 'main' set up to track 'origin/main'.
+2025-08-23T14:35:39.4408991Z ##[endgroup]
+2025-08-23T14:35:39.4452620Z [command]/usr/bin/git log -1 --format=%H
+2025-08-23T14:35:39.4477550Z 2ec502390f832756844845b8b748c1bfa6ab1b7f
+2025-08-23T14:35:39.4761149Z ##[group]Run actions/setup-python@v5
+2025-08-23T14:35:39.4762286Z with:
+2025-08-23T14:35:39.4763086Z   python-version: 3.11
+2025-08-23T14:35:39.4764163Z   check-latest: false
+2025-08-23T14:35:39.4765326Z   token: ***
+2025-08-23T14:35:39.4766212Z   update-environment: true
+2025-08-23T14:35:39.4767218Z   allow-prereleases: false
+2025-08-23T14:35:39.4768409Z   freethreaded: false
+2025-08-23T14:35:39.4769286Z env:
+2025-08-23T14:35:39.4770075Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:39.4771069Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:39.4772078Z   MAIN_BRANCH: main
+2025-08-23T14:35:39.4772937Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:39.4774030Z   OUT_DIR: transformed-data
+2025-08-23T14:35:39.4775183Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:39.4776664Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:39.4778042Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:39.4779041Z   PROFILE: tree_baseline
+2025-08-23T14:35:39.4780013Z ##[endgroup]
+2025-08-23T14:35:39.6446347Z ##[group]Installed versions
+2025-08-23T14:35:39.6577115Z Successfully set up CPython (3.11.13)
+2025-08-23T14:35:39.6579774Z ##[endgroup]
+2025-08-23T14:35:39.6711422Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:39.6712485Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:39.6714030Z [36;1mif [ -f tools/data_validation_reporter/requirements.txt ]; then[0m
+2025-08-23T14:35:39.6715782Z [36;1m  python -m pip install -r tools/data_validation_reporter/requirements.txt[0m
+2025-08-23T14:35:39.6717149Z [36;1melse[0m
+2025-08-23T14:35:39.6717976Z [36;1m  python -m pip install pandas[0m
+2025-08-23T14:35:39.6718947Z [36;1mfi[0m
+2025-08-23T14:35:39.7007419Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:39.7008321Z env:
+2025-08-23T14:35:39.7009059Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:39.7009971Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:39.7010888Z   MAIN_BRANCH: main
+2025-08-23T14:35:39.7011682Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:39.7012555Z   OUT_DIR: transformed-data
+2025-08-23T14:35:39.7013774Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:39.7015214Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:39.7016450Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:39.7017355Z   PROFILE: tree_baseline
+2025-08-23T14:35:39.7018454Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:39.7019978Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:35:39.7021453Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:39.7022799Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:39.7024258Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:39.7025611Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:35:39.7026754Z ##[endgroup]
+2025-08-23T14:35:42.1936514Z Collecting pandas
+2025-08-23T14:35:42.2302956Z   Downloading pandas-2.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (91 kB)
+2025-08-23T14:35:42.4408968Z Collecting numpy>=1.23.2 (from pandas)
+2025-08-23T14:35:42.4450975Z   Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2025-08-23T14:35:42.4701435Z Collecting python-dateutil>=2.8.2 (from pandas)
+2025-08-23T14:35:42.4738403Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+2025-08-23T14:35:42.5127502Z Collecting pytz>=2020.1 (from pandas)
+2025-08-23T14:35:42.5169598Z   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+2025-08-23T14:35:42.5345660Z Collecting tzdata>=2022.7 (from pandas)
+2025-08-23T14:35:42.5385658Z   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+2025-08-23T14:35:42.5564646Z Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas)
+2025-08-23T14:35:42.5600672Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2025-08-23T14:35:42.5687887Z Downloading pandas-2.3.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.4 MB)
+2025-08-23T14:35:42.6260150Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.4/12.4 MB 230.2 MB/s  0:00:00
+2025-08-23T14:35:42.6300365Z Downloading numpy-2.3.2-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.9 MB)
+2025-08-23T14:35:42.6976622Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.9/16.9 MB 256.9 MB/s  0:00:00
+2025-08-23T14:35:42.7021318Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+2025-08-23T14:35:42.7105049Z Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+2025-08-23T14:35:42.7197861Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+2025-08-23T14:35:42.7268169Z Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+2025-08-23T14:35:42.8346981Z Installing collected packages: pytz, tzdata, six, numpy, python-dateutil, pandas
+2025-08-23T14:35:48.9675821Z 
+2025-08-23T14:35:48.9687440Z Successfully installed numpy-2.3.2 pandas-2.3.2 python-dateutil-2.9.0.post0 pytz-2025.2 six-1.17.0 tzdata-2025.2
+2025-08-23T14:35:49.1239498Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:49.1239828Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:49.1240870Z [36;1mgit clone --depth 1 "***github.com/deepakkt/2025-dmml-data.git" data-repo[0m
+2025-08-23T14:35:49.1241242Z [36;1mcd data-repo[0m
+2025-08-23T14:35:49.1241533Z [36;1mgit checkout "${MAIN_BRANCH}" || git checkout -b "${MAIN_BRANCH}"[0m
+2025-08-23T14:35:49.1285160Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:49.1285420Z env:
+2025-08-23T14:35:49.1285602Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:49.1285840Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:49.1286063Z   MAIN_BRANCH: main
+2025-08-23T14:35:49.1286250Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:49.1286457Z   OUT_DIR: transformed-data
+2025-08-23T14:35:49.1286714Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:49.1287080Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:49.1287397Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:49.1287646Z   PROFILE: tree_baseline
+2025-08-23T14:35:49.1287912Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:49.1288316Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:35:49.1288699Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:49.1289035Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:49.1289406Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:49.1289754Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:35:49.1290039Z ##[endgroup]
+2025-08-23T14:35:49.1366066Z Cloning into 'data-repo'...
+2025-08-23T14:35:51.1323177Z Already on 'main'
+2025-08-23T14:35:51.1326666Z Your branch is up to date with 'origin/main'.
+2025-08-23T14:35:51.1419669Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:51.1419965Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:51.1420353Z [36;1mpython tools/data_validation_reporter/main.py --data-repo data-repo[0m
+2025-08-23T14:35:51.1461184Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:51.1461400Z env:
+2025-08-23T14:35:51.1461565Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:51.1461779Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:51.1461991Z   MAIN_BRANCH: main
+2025-08-23T14:35:51.1462171Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:51.1462385Z   OUT_DIR: transformed-data
+2025-08-23T14:35:51.1462629Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:51.1462975Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:51.1463273Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:51.1463666Z   PROFILE: tree_baseline
+2025-08-23T14:35:51.1463967Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.1464393Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:35:51.1464799Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.1465130Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.1465464Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.1465795Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:35:51.1466078Z ##[endgroup]
+2025-08-23T14:35:51.5509704Z [SKIP] data-repo/raw-data/2025-08-17-16:56:02/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5511290Z [SKIP] data-repo/raw-data/2025-08-17-16:56:02/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5512217Z [SKIP] data-repo/raw-data/2025-08-17-20:19:27/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5513151Z [SKIP] data-repo/raw-data/2025-08-17-20:19:27/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5514298Z [SKIP] data-repo/raw-data/2025-08-18-01:41:40/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5515193Z [SKIP] data-repo/raw-data/2025-08-18-01:41:40/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5516077Z [SKIP] data-repo/raw-data/2025-08-18-04:37:16/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5516973Z [SKIP] data-repo/raw-data/2025-08-18-04:37:16/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5517855Z [SKIP] data-repo/raw-data/2025-08-18-08:27:17/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5518768Z [SKIP] data-repo/raw-data/2025-08-18-08:27:17/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5519664Z [SKIP] data-repo/raw-data/2025-08-18-12:39:26/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5520543Z [SKIP] data-repo/raw-data/2025-08-18-12:39:26/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5521438Z [SKIP] data-repo/raw-data/2025-08-18-13:37:44/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5522413Z [SKIP] data-repo/raw-data/2025-08-18-13:37:44/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5523299Z [SKIP] data-repo/raw-data/2025-08-18-16:23:59/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5524351Z [SKIP] data-repo/raw-data/2025-08-18-16:23:59/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5525234Z [SKIP] data-repo/raw-data/2025-08-18-20:19:05/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5526125Z [SKIP] data-repo/raw-data/2025-08-18-20:19:05/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5527032Z [SKIP] data-repo/raw-data/2025-08-19-01:23:24/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5527908Z [SKIP] data-repo/raw-data/2025-08-19-01:23:24/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5529025Z [SKIP] data-repo/raw-data/2025-08-19-04:20:54/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5529912Z [SKIP] data-repo/raw-data/2025-08-19-04:20:54/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5530753Z [SKIP] data-repo/raw-data/2025-08-19-08:23:53/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5531637Z [SKIP] data-repo/raw-data/2025-08-19-08:23:53/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5532521Z [SKIP] data-repo/raw-data/2025-08-19-12:37:03/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5533349Z [SKIP] data-repo/raw-data/2025-08-19-12:37:03/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5534355Z [SKIP] data-repo/raw-data/2025-08-19-16:22:17/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5535186Z [SKIP] data-repo/raw-data/2025-08-19-16:22:17/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5536057Z [SKIP] data-repo/raw-data/2025-08-19-20:19:43/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5536899Z [SKIP] data-repo/raw-data/2025-08-19-20:19:43/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5537786Z [SKIP] data-repo/raw-data/2025-08-20-01:21:38/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5538609Z [SKIP] data-repo/raw-data/2025-08-20-01:21:38/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5539437Z [SKIP] data-repo/raw-data/2025-08-20-04:21:26/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5540495Z [SKIP] data-repo/raw-data/2025-08-20-04:21:26/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5541354Z [SKIP] data-repo/raw-data/2025-08-20-08:23:48/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5542164Z [SKIP] data-repo/raw-data/2025-08-20-08:23:48/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5542985Z [SKIP] data-repo/raw-data/2025-08-20-12:36:58/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5543981Z [SKIP] data-repo/raw-data/2025-08-20-12:36:58/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5544822Z [SKIP] data-repo/raw-data/2025-08-20-16:22:10/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5545680Z [SKIP] data-repo/raw-data/2025-08-20-16:22:10/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5546524Z [SKIP] data-repo/raw-data/2025-08-20-20:19:48/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5547374Z [SKIP] data-repo/raw-data/2025-08-20-20:19:48/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5548261Z [SKIP] data-repo/raw-data/2025-08-21-01:20:31/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5549100Z [SKIP] data-repo/raw-data/2025-08-21-01:20:31/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5549942Z [SKIP] data-repo/raw-data/2025-08-21-04:20:54/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5550794Z [SKIP] data-repo/raw-data/2025-08-21-04:20:54/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5551656Z [SKIP] data-repo/raw-data/2025-08-21-08:23:32/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5552489Z [SKIP] data-repo/raw-data/2025-08-21-08:23:32/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5553303Z [SKIP] data-repo/raw-data/2025-08-21-12:36:33/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5554290Z [SKIP] data-repo/raw-data/2025-08-21-12:36:33/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5555108Z [SKIP] data-repo/raw-data/2025-08-21-16:31:31/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5555934Z [SKIP] data-repo/raw-data/2025-08-21-16:31:31/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5556955Z [SKIP] data-repo/raw-data/2025-08-21-20:18:56/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5557792Z [SKIP] data-repo/raw-data/2025-08-21-20:18:56/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5558620Z [SKIP] data-repo/raw-data/2025-08-22-01:21:17/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5559458Z [SKIP] data-repo/raw-data/2025-08-22-01:21:17/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5560283Z [SKIP] data-repo/raw-data/2025-08-22-04:20:04/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5561129Z [SKIP] data-repo/raw-data/2025-08-22-04:20:04/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5561961Z [SKIP] data-repo/raw-data/2025-08-22-08:23:30/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5562766Z [SKIP] data-repo/raw-data/2025-08-22-08:23:30/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5563787Z [SKIP] data-repo/raw-data/2025-08-22-12:35:34/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5564635Z [SKIP] data-repo/raw-data/2025-08-22-12:35:34/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5565438Z [SKIP] data-repo/raw-data/2025-08-22-16:21:05/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5566278Z [SKIP] data-repo/raw-data/2025-08-22-16:21:05/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5567086Z [SKIP] data-repo/raw-data/2025-08-22-20:19:17/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5568107Z [SKIP] data-repo/raw-data/2025-08-22-20:19:17/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5569031Z [SKIP] data-repo/raw-data/2025-08-23-01:18:41/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5569900Z [SKIP] data-repo/raw-data/2025-08-23-01:18:41/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5570737Z [SKIP] data-repo/raw-data/2025-08-23-04:20:05/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5571557Z [SKIP] data-repo/raw-data/2025-08-23-04:20:05/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5572381Z [SKIP] data-repo/raw-data/2025-08-23-08:20:30/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5573208Z [SKIP] data-repo/raw-data/2025-08-23-08:20:30/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5574206Z [SKIP] data-repo/raw-data/2025-08-23-12:32:43/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5575105Z [SKIP] data-repo/raw-data/2025-08-23-12:32:43/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5576002Z [SKIP] data-repo/raw-data/2025-08-23-14:01:29/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5576857Z [SKIP] data-repo/raw-data/2025-08-23-14:01:29/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5577725Z [SKIP] data-repo/raw-data/2025-08-23-14:02:52/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5578579Z [SKIP] data-repo/raw-data/2025-08-23-14:02:52/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5579422Z [SKIP] data-repo/raw-data/2025-08-23-14:10:54/engagement/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5580301Z [SKIP] data-repo/raw-data/2025-08-23-14:10:54/satisfaction/data_cleansing_report.csv already exists
+2025-08-23T14:35:51.5581261Z [WRITE] data-repo/raw-data/2025-08-23-14:35:28/engagement/data_cleansing_report.csv (1025 issue rows)
+2025-08-23T14:35:51.5582190Z [WRITE] data-repo/raw-data/2025-08-23-14:35:28/satisfaction/data_cleansing_report.csv (284 issue rows)
+2025-08-23T14:35:51.5582888Z Processed files: 82, total issue rows: 1309
+2025-08-23T14:35:51.5953983Z ##[group]Run set -euo pipefail
+2025-08-23T14:35:51.5954340Z [36;1mset -euo pipefail[0m
+2025-08-23T14:35:51.5954563Z [36;1mcd data-repo[0m
+2025-08-23T14:35:51.5954827Z [36;1mgit config --global --add safe.directory "$PWD"[0m
+2025-08-23T14:35:51.5955150Z [36;1mgit config user.name "${GITHUB_ACTOR}"[0m
+2025-08-23T14:35:51.5955511Z [36;1mgit config user.email "${GITHUB_ACTOR}@users.noreply.github.com"[0m
+2025-08-23T14:35:51.5955836Z [36;1mgit add -A[0m
+2025-08-23T14:35:51.5956046Z [36;1mif git diff --cached --quiet; then[0m
+2025-08-23T14:35:51.5956331Z [36;1m  echo "No new validation reports to commit."[0m
+2025-08-23T14:35:51.5956589Z [36;1m  exit 0[0m
+2025-08-23T14:35:51.5956751Z [36;1mfi[0m
+2025-08-23T14:35:51.5957004Z [36;1mgit commit -m "Add data_cleansing_report.csv for new ingests"[0m
+2025-08-23T14:35:51.5957356Z [36;1mgit push origin "HEAD:${MAIN_BRANCH}"[0m
+2025-08-23T14:35:51.5998053Z shell: /usr/bin/bash -e {0}
+2025-08-23T14:35:51.5998275Z env:
+2025-08-23T14:35:51.5998475Z   DATA_REPO_OWNER: deepakkt
+2025-08-23T14:35:51.5998696Z   DATA_REPO_NAME: 2025-dmml-data
+2025-08-23T14:35:51.5998917Z   MAIN_BRANCH: main
+2025-08-23T14:35:51.5999095Z   DATA_REPO: 2025-dmml-data
+2025-08-23T14:35:51.5999297Z   OUT_DIR: transformed-data
+2025-08-23T14:35:51.5999556Z   SPEC_PATH: tools/data_transformation/feature_spec.json
+2025-08-23T14:35:51.5999920Z   SCRIPT_PATH: tools/data_transformation/transform_features.py
+2025-08-23T14:35:51.6000231Z   TABLE_NAME: features_churn_v1
+2025-08-23T14:35:51.6000442Z   PROFILE: tree_baseline
+2025-08-23T14:35:51.6000700Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.6001086Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+2025-08-23T14:35:51.6001456Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.6001950Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.6002291Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+2025-08-23T14:35:51.6002630Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+2025-08-23T14:35:51.6002919Z ##[endgroup]
+2025-08-23T14:35:51.7593821Z [main 7a4361a] Add data_cleansing_report.csv for new ingests
+2025-08-23T14:35:51.7594274Z  2 files changed, 1311 insertions(+)
+2025-08-23T14:35:51.7594663Z  create mode 100644 raw-data/2025-08-23-14:35:28/engagement/data_cleansing_report.csv
+2025-08-23T14:35:51.7595157Z  create mode 100644 raw-data/2025-08-23-14:35:28/satisfaction/data_cleansing_report.csv
+2025-08-23T14:35:52.3546124Z To https://github.com/deepakkt/2025-dmml-data.git
+2025-08-23T14:35:52.3546510Z    853026f..7a4361a  HEAD -> main
+2025-08-23T14:35:52.3647832Z Post job cleanup.
+2025-08-23T14:35:52.5303956Z Post job cleanup.
+2025-08-23T14:35:52.6248002Z [command]/usr/bin/git version
+2025-08-23T14:35:52.6283978Z git version 2.51.0
+2025-08-23T14:35:52.6320333Z Copying '/home/runner/.gitconfig' to '/home/runner/work/_temp/a5fc0869-09d0-482a-88b9-e5b0af82f81b/.gitconfig'
+2025-08-23T14:35:52.6330011Z Temporarily overriding HOME='/home/runner/work/_temp/a5fc0869-09d0-482a-88b9-e5b0af82f81b' before making global git config changes
+2025-08-23T14:35:52.6331122Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-23T14:35:52.6342952Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/2025-dmml-core/2025-dmml-core
+2025-08-23T14:35:52.6378281Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-23T14:35:52.6410759Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-23T14:35:52.6641733Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-23T14:35:52.6662968Z http.https://github.com/.extraheader
+2025-08-23T14:35:52.6675636Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-23T14:35:52.6706150Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-23T14:35:52.7035431Z Cleaning up orphan processes
