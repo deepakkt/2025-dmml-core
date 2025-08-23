@@ -1,0 +1,6 @@
+feast>=0.35,<0.37
+pandas>=2.2,<3
+dask[dataframe]>=2024.8.1,<2025.0.0
+pyarrow>=15,<19
+redis>=5,<6
+python-dateutil>=2.8.2
