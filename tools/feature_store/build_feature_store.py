@@ -282,7 +282,7 @@ def generate_catalog(df_sample: pd.DataFrame):
         rows.append({
             "feature_name": name,
             "version": meta["version"],
-            "dtype": meta["dtype"].__name__,
+            "dtype": _feast_dtype_to_str(meta["dtype"]),
             "description": meta["desc"],
             "source": "SQLite: main.features_churn_v1",
             "offline_available": "Y" if meta["offline"] else "N",
