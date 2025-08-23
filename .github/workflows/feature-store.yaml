@@ -50,16 +50,31 @@ jobs:
           token: ${{ secrets.DATA_REPO_TOKEN }}
           path: data-repo
 
+      - name: Wait for Redis
+        run: |
+          python - <<'PY'
+          import time, redis
+          for i in range(30):
+              try:
+                  r = redis.Redis(host='localhost', port=6379, db=0)
+                  r.ping()
+                  print("Redis is ready"); break
+              except Exception as e:
+                  print("Waiting for Redis...", e); time.sleep(2)
+              else:
+                  raise SystemExit("Redis not ready")
+          PY
+
       - name: Build/apply/materialize Feast repo, validate data, and generate catalog
         run: |
           python tools/feature_store/build_feature_store.py \
             --data-repo ./data-repo \
             --repo-path ./feature_repo \
-            --redis "redis://localhost:6379/0" \
+            --redis "localhost:6379,db=0" \
             --apply \
             --materialize \
             --generate-catalog
-
+            
       - name: Commit generated docs if changed
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

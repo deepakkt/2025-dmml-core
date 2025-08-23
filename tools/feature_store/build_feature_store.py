@@ -2,17 +2,17 @@
 """
 Build & materialize a Feast feature store from a SQLite source (soft-fail validation).
 
-- Source of truth: 2025-dmml-data/transformed-data/transformed.sqlite
+Source of truth (in 2025-dmml-data):
+  transformed-data/transformed.sqlite
   table: main.features_churn_v1 (unique key on [customer_id, asof_date])
 
 Flow:
   1) Read from SQLite
   2) Validate & coerce (SOFT by default): log invalid rows to stdout, drop them, continue
+     Use --strict-validation to hard-fail on any issue.
   3) Export an ephemeral parquet snapshot under feature_repo/_sqlite_export/
   4) feast apply + (optional) materialize to Redis
   5) Generate docs/FEATURE_CATALOG.md and docs/feature_catalog.csv
-
-Use --strict-validation to revert to hard-fail behavior.
 """
 import argparse
 from pathlib import Path
@@ -22,7 +22,7 @@ import pandas as pd
 
 # Feast
 from feast import FeatureStore, FeatureView, FileSource, Entity, Field, FeatureService
-from feast.types import Int64, Float32
+from feast.types import Int64, Float32, ValueType
 
 CATALOG_MD = Path("docs/FEATURE_CATALOG.md")
 CATALOG_CSV = Path("docs/feature_catalog.csv")
@@ -112,10 +112,10 @@ def clean_and_report(df: pd.DataFrame, *, strict: bool = False, max_examples: in
         bad_idx = bad_mask[bad_mask].index
         if len(bad_idx) == 0:
             return
-        issues.append((name, len(bad_idx), detail, df.loc[bad_idx, ["customer_id", "asof_date"]].head(max_examples)))
-        if strict:
-            pass  # collect and raise later
-        else:
+        issues.append(
+            (name, len(bad_idx), detail, df.loc[bad_idx, ["customer_id", "asof_date"]].head(max_examples))
+        )
+        if not strict:
             valid_mask.loc[bad_idx] = False  # drop these rows
 
     # Key/timestamp presence
@@ -131,7 +131,8 @@ def clean_and_report(df: pd.DataFrame, *, strict: bool = False, max_examples: in
     # Other 0/1 flags (exclude integer measures that aren't flags)
     flag_cols = [
         c for c, m in FEATURE_META.items()
-        if m["dtype"] == Int64 and c not in ["tenure_days", "days_since_last_login", "churned"]
+        if m["dtype"] == Int64
+        and c not in ["tenure_days", "days_since_last_login", "churned"]
         and c not in ["plan_0", "plan_1", "plan_2"]
     ]
     for c in flag_cols:
@@ -142,11 +143,14 @@ def clean_and_report(df: pd.DataFrame, *, strict: bool = False, max_examples: in
         flag(f"{c} negative", df[c].dropna() < 0, f"{c} must be >= 0")
 
     # Ranges
-    flag("email_open_rate_30d range", ~df["email_open_rate_30d"].between(0.0, 1.0, inclusive="both"),
+    flag("email_open_rate_30d range",
+         ~df["email_open_rate_30d"].between(0.0, 1.0, inclusive="both"),
          "email_open_rate_30d must be in [0,1]")
-    flag("asof_month_sin range", ~df["asof_month_sin"].between(-1.0, 1.0, inclusive="both"),
+    flag("asof_month_sin range",
+         ~df["asof_month_sin"].between(-1.0, 1.0, inclusive="both"),
          "asof_month_sin must be in [-1,1]")
-    flag("asof_month_cos range", ~df["asof_month_cos"].between(-1.0, 1.0, inclusive="both"),
+    flag("asof_month_cos range",
+         ~df["asof_month_cos"].between(-1.0, 1.0, inclusive="both"),
          "asof_month_cos must be in [-1,1]")
 
     # Auto-renew exclusivity
@@ -171,16 +175,14 @@ def clean_and_report(df: pd.DataFrame, *, strict: bool = False, max_examples: in
         print(f"Summary: total={total}, dropped={dropped}, kept={kept}")
         print("============================================\n")
 
-    # Hard fail if requested
+    # Strict mode hard-fail
     if strict and issues:
         raise SystemExit("VALIDATION FAILED (strict mode). See report above.")
 
     # Drop offending rows in soft mode
     df_clean = df[valid_mask].copy()
-
     if df_clean.empty:
         raise SystemExit("VALIDATION FAILED: no valid rows remain after dropping invalid records.")
-
     return df_clean
 
 # -----------------------------
@@ -193,7 +195,10 @@ def export_ephemeral_snapshot(df: pd.DataFrame, repo_path: Path) -> Path:
     df.to_parquet(out_path, index=False, engine="pyarrow")
     return out_path
 
-def ensure_repo_yaml(repo_path: Path, redis_uri: str):
+def ensure_repo_yaml(repo_path: Path, redis_conn: str):
+    """
+    redis_conn should be like: 'localhost:6379,db=0'  (NO scheme)
+    """
     repo_path.mkdir(parents=True, exist_ok=True)
     (repo_path / "feature_store.yaml").write_text(
 f"""project: dm4ml_churn
@@ -203,13 +208,17 @@ offline_store:
   type: file
 online_store:
   type: redis
-  connection_string: "{redis_uri}"
-entity_key_serialization_version: 2
+  connection_string: "{redis_conn}"
+entity_key_serialization_version: 3
 """
     )
 
 def build_objects(snapshot_path: Path):
-    customer = Entity(name="customer_id", join_keys=["customer_id"])
+    customer = Entity(
+        name="customer_id",
+        join_keys=["customer_id"],
+        value_type=ValueType.STRING,  # future-proof + quiet deprecation warnings
+    )
 
     file_src = FileSource(
         name="sqlite_snapshot_source",
@@ -277,7 +286,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-repo", required=True, help="Path to 2025-dmml-data clone")
     ap.add_argument("--repo-path", required=True, help="Path to write Feast repo (feature_store.yaml, registry, snapshot)")
-    ap.add_argument("--redis", default="redis://localhost:6379/0", help="Redis connection string")
+    ap.add_argument("--redis", default="localhost:6379,db=0", help="Redis connection string (no scheme)")
     ap.add_argument("--sqlite-db", default=None, help="Override path to transformed.sqlite")
     ap.add_argument("--sqlite-table", default="main.features_churn_v1", help="Table name")
     ap.add_argument("--apply", action="store_true", help="feast apply")
