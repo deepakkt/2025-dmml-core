@@ -1,7 +1,10 @@
 name: Feature Store - Feast (Nightly)
 
 on:
-  workflow_dispatch: {}
+  workflow_run:
+    workflows: ["Transform features and store"]
+    types: [completed]
+  workflow_dispatch: {}     # On-demand trigger
 
 permissions:
   contents: write

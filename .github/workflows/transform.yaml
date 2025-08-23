@@ -1,7 +1,10 @@
 name: Transform features and store
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Data Preparation — Merge & Clean"]
+    types: [completed]
+  workflow_dispatch: {}     # On-demand trigger
 
 jobs:
   transform-and-store:

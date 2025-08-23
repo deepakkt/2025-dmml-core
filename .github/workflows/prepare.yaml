@@ -1,7 +1,10 @@
 name: Data Preparation — Merge & Clean
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Data Validation Reporter"]
+    types: [completed]
+  workflow_dispatch: {}     # On-demand trigger  
 
 jobs:
   prepare-and-merge:

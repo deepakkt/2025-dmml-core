@@ -2,7 +2,10 @@
 name: Train Churn Model (Section 9)
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Feature Store - Feast (Nightly)"]
+    types: [completed]
+  workflow_dispatch: {}     # On-demand trigger
 
 jobs:
   train:
